@@ -50,7 +50,7 @@ public class HCPSbpVersion implements Writeable,PrimitiveSinkable {
         if (getClass()!=obj.getClass())
             return false;
         HCPSbpVersion other=(HCPSbpVersion)obj;
-        if (sbpVersion!=sbpVersion)
+        if (sbpVersion!=other.sbpVersion)
             return false;
         if (hcpVersion!=other.hcpVersion)
             return false;

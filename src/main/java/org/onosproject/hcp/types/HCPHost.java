@@ -5,6 +5,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.onosproject.hcp.protocol.HCPHostState;
 import org.onosproject.hcp.protocol.Writeable;
+import org.onosproject.hcp.protocol.ver10.HCPHostStateSerializerVer10;
 
 /**
  * @Author ldy
@@ -48,6 +49,7 @@ public class HCPHost implements Writeable,PrimitiveSinkable {
     public void writeTo(ChannelBuffer bb) {
         iPv4Address.writeTo(bb);
         macAddress.write6Bytes(bb);
+        HCPHostStateSerializerVer10.writeTo(bb,hostState);
 
     }
 

@@ -6,6 +6,7 @@ import org.onosproject.hcp.exceptions.HCPParseError;
 import org.onosproject.hcp.protocol.*;
 import org.onosproject.hcp.protocol.errormsg.HCPBadRequestErrorMsg;
 import org.onosproject.hcp.types.HCPErrorCauseData;
+import org.onosproject.hcp.types.U32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LoggerFactoryBinder;
@@ -123,8 +124,12 @@ public class HCPBadRequestErrorMessgeVer10 implements HCPBadRequestErrorMsg {
             int start =bb.readerIndex();
             //version
             byte version=bb.readByte();
-            //HCP type
+            if (version!=(byte)0x1)
+                throw new HCPParseError("Wrong version:Expected=HCPVersion.HCP_10(1), got="+version);
+            //type
             byte type=bb.readByte();
+            if (type!=(byte)0x1)
+                throw new HCPParseError("Wrong type:Expected=HCPType.HCP_ERROR,got="+type);
             //length
             short length=bb.readShort();
             if (length<MINIMUM_LENGTH)
@@ -134,7 +139,7 @@ public class HCPBadRequestErrorMessgeVer10 implements HCPBadRequestErrorMsg {
                 return null;
             }
             //xid
-            long xid=bb.readInt();
+            long xid= U32.f(bb.readInt());
             //ERROR Type
             short errorType=bb.readShort();
             //errCode

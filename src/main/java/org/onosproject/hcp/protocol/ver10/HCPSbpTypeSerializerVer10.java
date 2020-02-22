@@ -14,7 +14,7 @@ public class HCPSbpTypeSerializerVer10 {
     public final static byte POF_VAL=1<<0;
     public final static byte OPENFLOW_VAL=1<<1;
     public final static byte NETCONF_VAL=1<<2;
-    public final static byte XMPP_VAL=1<<4;
+    public final static byte XMPP_VAL=1<<3;
 
     public static HCPSbpType readFrom(ChannelBuffer bb) throws HCPParseError{
         try{

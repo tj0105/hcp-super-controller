@@ -6,6 +6,7 @@ import org.onosproject.hcp.exceptions.HCPParseError;
 import org.onosproject.hcp.protocol.*;
 import org.onosproject.hcp.protocol.errormsg.HCPDomainConfigFailedErrorMessage;
 import org.onosproject.hcp.types.HCPErrorCauseData;
+import org.onosproject.hcp.types.U32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,8 +109,12 @@ public class HCPDomainConfigFailedErrorMessageVer10 implements HCPDomainConfigFa
             int startIndex=bb.readerIndex();
             //version
             byte version = bb.readByte();
+            if (version!=(byte)0x1)
+                throw new HCPParseError("Wrong version:Expected=HCPVersion.HCP_10(1), got="+version);
             //type
-            byte type = bb.readByte();
+            byte type=bb.readByte();
+            if (type!=(byte)0x1)
+                throw new HCPParseError("Wrong type:Expected=HCPType.HCP_ERROR,got="+type);
             //length
             int length = bb.readShort();
             if (length < MINIMUM_LENGTH)
@@ -119,7 +124,7 @@ public class HCPDomainConfigFailedErrorMessageVer10 implements HCPDomainConfigFa
                 return null;
             }
             //xid
-            long xid = bb.readInt();
+            long xid = U32.f(bb.readInt());
             //errType
             short errType = bb.readShort();
             //errCode

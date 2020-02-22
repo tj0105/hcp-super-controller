@@ -9,5 +9,6 @@ public interface HCPForwardingReply extends HCPSbpCmpData {
     int getSrcVport();
     int getDstVport();
     short getEthType();
+    byte getQos();
     DomainId getDomainId();
 }
