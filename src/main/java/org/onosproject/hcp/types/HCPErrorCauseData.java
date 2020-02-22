@@ -16,7 +16,7 @@ import java.util.Arrays;
 import com.google.common.base.Optional;
 
 public class HCPErrorCauseData implements Writeable,PrimitiveSinkable {
-    private final static Logger logger=LoggerFactory.getLogger(HCPErrorCauseData.class);
+    public final static Logger logger=LoggerFactory.getLogger(HCPErrorCauseData.class);
 
 
     public final static HCPErrorCauseData NONE=new HCPErrorCauseData(new byte[0], HCPVersion.HCP_10);
@@ -51,7 +51,7 @@ public class HCPErrorCauseData implements Writeable,PrimitiveSinkable {
         return new HCPErrorCauseData(data,hcpVersion);
     }
 
-    public static HCPErrorCauseData read(ChannelBuffer bb,int length,HCPVersion hcpVersion){
+    public static HCPErrorCauseData readFrom(ChannelBuffer bb,int length,HCPVersion hcpVersion){
         byte[] data= ChannelUtils.readBytes(bb,length);
         return of(data,hcpVersion);
     }

@@ -29,12 +29,12 @@ public class HCPBadRequestCodeSerialiserVer10 {
         }
     }
 
-    public void writeTo(ChannelBuffer bb,HCPBadRequestCode e) {
+    public static void writeTo(ChannelBuffer bb,HCPBadRequestCode e) {
         bb.writeShort(toWrieValue(e));
     }
 
 
-    public void putTo(PrimitiveSink sink,HCPBadRequestCode e) {
+    public static void putTo(PrimitiveSink sink,HCPBadRequestCode e) {
         sink.putShort(toWrieValue(e));
     }
 

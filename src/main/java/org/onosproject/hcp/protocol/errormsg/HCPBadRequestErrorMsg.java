@@ -18,6 +18,7 @@ public interface HCPBadRequestErrorMsg extends HCPObject,HCPErrorMessage {
     HCPErrorCauseData getData();
 
     void writeTo(ChannelBuffer bb);
+
     public interface Builder extends HCPErrorMessage.Builder{
         HCPBadRequestErrorMsg build();
         HCPVersion getVersion();
