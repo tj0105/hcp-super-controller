@@ -58,15 +58,15 @@ public class HCPEchoRequestVer10 implements HCPEchoRequest{
         return data;
     }
     @Override
-    public void writeTo(ChannelBuffer bb) {
-
+    public void writeTo(ChannelBuffer bb)  {
+        WRITER.write(bb,this);
     }
 
     final static Writer WRITER=new Writer();
     static class Writer implements HCPMessageWriter<HCPEchoRequestVer10> {
 
         @Override
-        public void write(ChannelBuffer bb, HCPEchoRequestVer10 message) throws HCPParseError {
+        public void write(ChannelBuffer bb, HCPEchoRequestVer10 message) {
             int startIndex=bb.writerIndex();
             //version=1;
             bb.writeByte(1);

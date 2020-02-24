@@ -2,13 +2,14 @@ package org.onosproject.hcp.protocol;
 
 import javafx.util.Builder;
 import org.jboss.netty.buffer.ChannelBuffer;
+import org.onosproject.hcp.exceptions.HCPParseError;
 
 public interface HCPMessage extends HCPObject {
     HCPVersion getVersion();
     HCPType getType();
     long getXid();
 
-    void writeTo(ChannelBuffer bb);
+    void writeTo(ChannelBuffer bb) throws HCPParseError;
 
     Builder createBuilder();
     public interface Builder{

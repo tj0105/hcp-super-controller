@@ -40,6 +40,9 @@ public class HCPInternalLink implements Writeable,PrimitiveSinkable {
         return capability;
     }
 
+    public static HCPInternalLink of(HCPVport srcVPort,HCPVport dstVport,long capability){
+        return new HCPInternalLink(srcVPort,dstVport,capability);
+    }
     @Override
     public void writeTo(ChannelBuffer bb) {
         srcVPort.writeTo(bb);
