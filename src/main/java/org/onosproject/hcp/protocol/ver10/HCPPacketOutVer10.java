@@ -44,7 +44,7 @@ public class HCPPacketOutVer10 implements HCPPacketOut {
     }
 
     @Override
-    public void writeTo(ChannelBuffer bb) throws HCPParseError {
+    public void writeTo(ChannelBuffer bb) {
         bb.writeInt(outPortNumber);
         bb.writeBytes(data);
     }

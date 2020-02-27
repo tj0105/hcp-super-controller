@@ -9,7 +9,7 @@ public interface HCPEchoRequest extends HCPObject,HCPMessage{
     long getXid();
     byte [] getData();
 
-    void writeTo(ChannelBuffer bb) throws HCPParseError;
+    void writeTo(ChannelBuffer bb);
 
     Builder createBuilder();
     public interface Builder extends HCPMessage.Builder{

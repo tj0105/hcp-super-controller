@@ -84,9 +84,9 @@ public final class HCPMessageVer10 {
                     return HCPVportStatusVer10.READER.readFrom(bb);
                 case (byte)0xf:
                     //discriminator value HCPType=15 for class HCPSbpMessageVer10
-                    return HCPSbpMessageVer10.READER.readFrom(bb);
+                    return HCPSbpVer10.READER.readFrom(bb);
                 default:
-                    throw new HCPParseError("Unknown value for discriminator type of class HCPMessageVer10: " + type)
+                    throw new HCPParseError("Unknown value for discriminator type of class HCPMessageVer10: " + type);
 
             }
         }

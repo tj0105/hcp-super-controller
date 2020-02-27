@@ -9,7 +9,7 @@ public interface HCPMessage extends HCPObject {
     HCPType getType();
     long getXid();
 
-    void writeTo(ChannelBuffer bb) throws HCPParseError;
+    void writeTo(ChannelBuffer bb) ;
 
     Builder createBuilder();
     public interface Builder{

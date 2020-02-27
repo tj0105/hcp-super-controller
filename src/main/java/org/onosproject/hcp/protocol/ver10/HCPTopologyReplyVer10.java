@@ -123,40 +123,45 @@ public class HCPTopologyReplyVer10 implements HCPTopologyReply{
     }
 
     static class Builder implements HCPTopologyReply.Builder{
-
+        private long xid;
+        private List<HCPInternalLink> internalLinks;
         @Override
         public HCPTopologyReply build() {
-            return null;
+            if (internalLinks==null)
+                throw new NullPointerException("HCPTopologyVer10: property internalinks must not be null");
+            return new HCPTopologyReplyVer10(xid,internalLinks);
         }
 
         @Override
         public HCPVersion getVersion() {
-            return null;
+            return HCPVersion.HCP_10;
         }
 
         @Override
         public HCPType getType() {
-            return null;
+            return HCPType.HCP_TOPO_REPLY;
         }
 
         @Override
         public long getXid() {
-            return 0;
+            return xid;
         }
 
         @Override
         public HCPTopologyReply.Builder setXid(long xid) {
-            return null;
+            this.xid=xid;
+            return this;
         }
 
         @Override
         public List<HCPInternalLink> getInternalLink() {
-            return null;
+            return internalLinks;
         }
 
         @Override
         public HCPTopologyReply.Builder setInternalLink(List<HCPInternalLink> InternalLinklist) {
-            return null;
+            this.internalLinks=InternalLinklist;
+            return this;
         }
     }
 
@@ -170,5 +175,17 @@ public class HCPTopologyReplyVer10 implements HCPTopologyReply{
 
     }
 
-
+    @Override
+    public boolean equals(Object obj) {
+        if (this==obj)
+            return false;
+        if (obj==null|| getClass()!=obj.getClass())
+            return false;
+        HCPTopologyReplyVer10 other=(HCPTopologyReplyVer10) obj;
+        if(this.xid!=other.xid)
+            return false;
+        if (!this.internalLinks.equals(other.internalLinks))
+            return false;
+        return true;
+    }
 }

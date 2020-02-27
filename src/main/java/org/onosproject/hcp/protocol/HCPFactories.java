@@ -2,6 +2,7 @@ package org.onosproject.hcp.protocol;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.onosproject.hcp.exceptions.HCPParseError;
+import org.onosproject.hcp.protocol.ver10.HCPFactoryVer10;
 import org.onosproject.hcp.types.U8;
 
 /**
