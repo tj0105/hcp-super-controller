@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 
 public class HCPSbpVersion implements Writeable,PrimitiveSinkable {
     private final static Logger logger= LoggerFactory.getLogger(HCPErrorCauseData.class);
-
     private final byte sbpVersion;
     private final HCPVersion hcpVersion;
 

@@ -2,7 +2,6 @@ package org.onosproject.hcp.protocol;
 
 import org.onosproject.hcp.protocol.errormsg.HCPErrorMsgBuild;
 import org.onosproject.hcp.types.HCPVport;
-import sun.java2d.xr.XIDGenerator;
 
 import java.util.List;
 

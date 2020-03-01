@@ -6,7 +6,7 @@ import org.onosproject.hcp.exceptions.HCPParseError;
 import org.onosproject.hcp.protocol.HCPBadRequestCode;
 import org.onosproject.hcp.protocol.Writeable;
 import org.onosproject.hcp.types.PrimitiveSinkable;
-
+import org.onosproject.floodlightpof.protocol.OFMatch20;
 /**
  * @Author ldy
  * @Date: 20-2-19 上午11:46
@@ -27,6 +27,7 @@ public class HCPBadRequestCodeSerialiserVer10 {
         }catch (IllegalArgumentException e){
             throw new HCPParseError(e);
         }
+
     }
 
     public static void writeTo(ChannelBuffer bb,HCPBadRequestCode e) {
