@@ -1,6 +1,6 @@
 package org.onosproject.api.domain;
 
-import org.onosproject.api.Super.HCPSuper;
+import org.onosproject.api.HCPSuper;
 import org.onosproject.api.Super.HCPSuperMessageListener;
 import org.onosproject.hcp.protocol.*;
 import org.onosproject.hcp.types.DomainId;
@@ -27,14 +27,17 @@ public interface HCPDomainController {
      * @param hcpSuper
      * @return
      */
-    boolean superConnect(HCPSuper hcpSuper);
+    boolean connectToSuperController(HCPSuper hcpSuper);
 
     boolean isConnectToSuper();
 
     void addMessageListener(HCPSuperMessageListener listener);
 
-    void removeMessageListerner(HCPSuperMessageListener listener);
+    void removeMessageListener(HCPSuperMessageListener listener);
 
+    void addHCPSuperControllerListener(HCPSuperControllerListener listener);
+
+    void removeHCPSuperControllerListener(HCPSuperControllerListener listener);
     /**
      * send a message to HCPSuperController
      * @param message

@@ -1,40 +1,42 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1583034462985
+Bnd-LastModified: 1583045735622
 Build-Jdk: 1.8.0_131
 Built-By: ldy
+Bundle-Blueprint: OSGI-INF/blueprint/shell-config.xml
 Bundle-Description: ONOS OSGi bundle archetype
 Bundle-ManifestVersion: 2
 Bundle-Name: hcp-domain-system
 Bundle-SymbolicName: org.onosproject.hcp-domain-system
 Bundle-Version: 1.0.0.SNAPSHOT
 Created-By: Apache Maven Bundle Plugin
-Export-Package: org.onosproject.hcp.types;uses:="com.google.common.base,
- com.google.common.hash,javax.annotation,org.jboss.netty.buffer,org.onos
- project.hcp.exceptions,org.onosproject.hcp.protocol,org.slf4j";version=
- "1.0.0",org.onosproject.hcp.util;uses:="org.jboss.netty.buffer,org.onos
- project.hcp.exceptions,org.onosproject.hcp.protocol";version="1.0.0",or
+Export-Package: org.onosproject.hcp.types;version="1.0.0";uses:="com.goo
+ gle.common.base,com.google.common.hash,javax.annotation,org.jboss.netty
+ .buffer,org.onosproject.hcp.exceptions,org.onosproject.hcp.protocol,org
+ .slf4j",org.onosproject.hcp.util;version="1.0.0";uses:="org.jboss.netty
+ .buffer,org.onosproject.hcp.exceptions,org.onosproject.hcp.protocol",or
  g.onosproject.hcp.exceptions;version="1.0.0",org.onosproject.hcp.protoc
- ol;uses:="com.google.common.hash,org.jboss.netty.buffer,org.onosproject
- .hcp.exceptions,org.onosproject.hcp.protocol.errormsg,org.onosproject.h
- cp.types";version="1.0.0",org.onosproject.hcp.protocol.errormsg;uses:="
- org.jboss.netty.buffer,org.onosproject.hcp.protocol,org.onosproject.hcp
- .types";version="1.0.0",org.onosproject.hcp.protocol.ver10;uses:="com.g
- oogle.common.hash,org.jboss.netty.buffer,org.onosproject.hcp.exceptions
- ,org.onosproject.hcp.protocol,org.onosproject.hcp.protocol.errormsg,org
- .onosproject.hcp.types,org.slf4j";version="1.0.0",org.onosproject.api.d
- omain;uses:="org.onosproject.api.Super,org.onosproject.hcp.protocol,org
- .onosproject.hcp.types";version="1.0.0",org.onosproject.api.Super;uses:
- ="org.jboss.netty.channel,org.onosproject.hcp.protocol";version="1.0.0"
- ,org.onosproject.cliSSS;uses:="org.apache.karaf.shell.commands,org.onos
- project.cli";version="1.0.0",org.onosproject.system.domain;uses:="io.ne
- tty.channel,io.netty.channel.socket,org.jboss.netty.bootstrap,org.jboss
- .netty.channel,org.jboss.netty.handler.timeout,org.jboss.netty.util,org
- .onosproject.api.Super,org.onosproject.api.domain,org.onosproject.core,
- org.onosproject.hcp.protocol,org.onosproject.hcp.types,org.onosproject.
- net.host,org.slf4j";version="1.0.0",org.onosproject.system;uses:="org.j
- boss.netty.buffer,org.jboss.netty.channel,org.jboss.netty.handler.codec
- .frame,org.jboss.netty.handler.codec.oneone,org.onosproject.api.Super,o
- rg.onosproject.api.domain,org.onosproject.hcp.protocol";version="1.0.0"
+ ol;version="1.0.0";uses:="com.google.common.hash,org.jboss.netty.buffer
+ ,org.onosproject.hcp.exceptions,org.onosproject.hcp.protocol.errormsg,o
+ rg.onosproject.hcp.types",org.onosproject.hcp.protocol.errormsg;version
+ ="1.0.0";uses:="org.jboss.netty.buffer,org.onosproject.hcp.protocol,org
+ .onosproject.hcp.types",org.onosproject.hcp.protocol.ver10;version="1.0
+ .0";uses:="com.google.common.hash,org.jboss.netty.buffer,org.onosprojec
+ t.hcp.exceptions,org.onosproject.hcp.protocol,org.onosproject.hcp.proto
+ col.errormsg,org.onosproject.hcp.types,org.slf4j",org.onosproject.api.d
+ omain;version="1.0.0";uses:="org.onosproject.api.Super,org.onosproject.
+ hcp.protocol,org.onosproject.hcp.types",org.onosproject.api.Super;versi
+ on="1.0.0";uses:="org.jboss.netty.channel,org.onosproject.hcp.protocol"
+ ,org.onosproject.command;version="1.0.0";uses:="org.apache.karaf.shell.
+ commands,org.onosproject.cli",org.onosproject.system.domain;version="1.
+ 0.0";uses:="io.netty.channel,io.netty.channel.socket,org.jboss.netty.bo
+ otstrap,org.jboss.netty.channel,org.jboss.netty.handler.timeout,org.jbo
+ ss.netty.util,org.onosproject.api.Super,org.onosproject.api.domain,org.
+ onosproject.core,org.onosproject.hcp.protocol,org.onosproject.hcp.types
+ ,org.onosproject.net.host,org.slf4j",org.onosproject.system;version="1.
+ 0.0";uses:="org.jboss.netty.buffer,org.jboss.netty.channel,org.jboss.ne
+ tty.handler.codec.frame,org.jboss.netty.handler.codec.oneone,org.onospr
+ oject.api.Super,org.onosproject.api.domain,org.onosproject.core,org.ono
+ sproject.hcp.protocol,org.onosproject.net.behaviour"
 Import-Package: com.google.common.base;version="[22.0,23)",com.google.co
  mmon.collect;version="[22.0,23)",com.google.common.hash;version="[22.0,
  23)",com.google.common.primitives;version="[22.0,23)",io.netty.buffer;v
@@ -49,16 +51,20 @@ Import-Package: com.google.common.base;version="[22.0,23)",com.google.co
  ;version="[3.10,4)",org.jboss.netty.handler.codec.oneone;version="[3.10
  ,4)",org.jboss.netty.handler.timeout;version="[3.10,4)",org.jboss.netty
  .util;version="[3.10,4)",org.onlab.packet;version="[1.11,2)",org.onlab.
- util;version="[1.11,2)",org.onosproject.api.Super,org.onosproject.api.d
- omain,org.onosproject.cli;version="[1.11,2)",org.onosproject.core;versi
- on="[1.11,2)",org.onosproject.event;version="[1.11,2)",org.onosproject.
- hcp.exceptions,org.onosproject.hcp.protocol,org.onosproject.hcp.protoco
- l.errormsg,org.onosproject.hcp.protocol.ver10,org.onosproject.hcp.types
- ,org.onosproject.hcp.util,org.onosproject.net;version="[1.11,2)",org.on
- osproject.net.host;version="[1.11,2)",org.onosproject.system,org.slf4j;
- version="[1.7,2)"
+ util;version="[1.11,2)",org.onosproject.api.Super;version="[1.0,2)",org
+ .onosproject.api.domain;version="[1.0,2)",org.onosproject.cli;version="
+ [1.11,2)",org.onosproject.core;version="[1.11,2)",org.onosproject.event
+ ;version="[1.11,2)",org.onosproject.hcp.exceptions;version="[1.0,2)",or
+ g.onosproject.hcp.protocol;version="[1.0,2)",org.onosproject.hcp.protoc
+ ol.errormsg;version="[1.0,2)",org.onosproject.hcp.protocol.ver10;versio
+ n="[1.0,2)",org.onosproject.hcp.types;version="[1.0,2)",org.onosproject
+ .hcp.util;version="[1.0,2)",org.onosproject.net;version="[1.11,2)",org.
+ onosproject.net.behaviour;version="[1.11,2)",org.onosproject.net.host;v
+ ersion="[1.11,2)",org.onosproject.system;version="[1.0,2)",org.onosproj
+ ect.system.domain;version="[1.0,2)",org.osgi.service.blueprint;version=
+ "[1.0.0,2.0.0)",org.slf4j;version="[1.7,2)"
 Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
 Service-Component: OSGI-INF/org.onosproject.system.domain.HCPDomainContr
  ollerImp.xml,OSGI-INF/org.onosproject.system.domain.HCPDomainHostManage
- r.xml
+ r.xml,OSGI-INF/org.onosproject.system.OvsManageManagerNew.xml
 Tool: Bnd-3.0.0.201509101326

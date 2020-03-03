@@ -1,4 +1,4 @@
-package org.onosproject.api.Super;
+package org.onosproject.api;
 
 import org.jboss.netty.channel.Channel;
 import org.onosproject.hcp.protocol.HCPFactory;
@@ -27,8 +27,6 @@ public interface HCPSuper {
     String ChannelId();
 
     void disConnectSuper();
-
-    boolean connectSuper();
 
     void setChannel(Channel channel);
 

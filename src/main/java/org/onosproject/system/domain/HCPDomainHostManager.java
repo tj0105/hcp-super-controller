@@ -2,12 +2,12 @@ package org.onosproject.system.domain;
 
 import org.apache.felix.scr.annotations.*;
 import org.onlab.packet.IpAddress;
-import org.onosproject.api.Super.HCPSuper;
+import org.onosproject.api.HCPSuper;
 import org.onosproject.api.Super.HCPSuperMessageListener;
 import org.onosproject.api.domain.HCPDomainController;
+import org.onosproject.api.domain.HCPSuperControllerListener;
 import org.onosproject.hcp.protocol.*;
 import org.onosproject.hcp.types.HCPHost;
-import org.onosproject.hcp.types.IPAddress;
 import org.onosproject.hcp.types.IPv4Address;
 import org.onosproject.hcp.types.MacAddress;
 import org.onosproject.net.Host;
@@ -40,11 +40,14 @@ public class HCPDomainHostManager {
 
     private HostListener hostListener=new InternalHostListener();
     private HCPSuperMessageListener hcpSuperMessageListener=new InternalHCPSuperMessageListener();
+    private HCPSuperControllerListener hcpSuperControllerListener=new InternalHCPSuperControllerListener();
+
     @Activate
     public void activate(){
         hcpVersion=domainController.getHCPVersion();
         hcpFactory= HCPFactories.getFactory(hcpVersion);
         domainController.addMessageListener(hcpSuperMessageListener);
+        domainController.addHCPSuperControllerListener(hcpSuperControllerListener);
         hostService.addListener(hostListener);
         log.info("domainController: superIp:{} superPort{}",domainController.getHCPSuperIp(),domainController.getHCPSuperPort());
     }
@@ -53,7 +56,8 @@ public class HCPDomainHostManager {
     @Deactivate
     public void deactivate(){
         hostService.removeListener(hostListener);
-        domainController.removeMessageListerner(hcpSuperMessageListener);
+        domainController.removeMessageListener(hcpSuperMessageListener);
+        domainController.removeHCPSuperControllerListener(hcpSuperControllerListener);
         log.info("hostmanager stoped");
     }
 
@@ -147,6 +151,19 @@ public class HCPDomainHostManager {
 
         @Override
         public void handleOutGoingMessage(List<HCPMessage> messages) {
+
+        }
+    }
+
+    private class InternalHCPSuperControllerListener implements  HCPSuperControllerListener{
+
+        @Override
+        public void connectToSuperController(HCPSuper hcpSuper) {
+            updateExisHosts();
+        }
+
+        @Override
+        public void disconnectSuperController(HCPSuper hcpSuper) {
 
         }
     }

@@ -6,6 +6,7 @@
         <additionalProperties>
           <property key="Bundle-Description" value="ONOS OSGi bundle archetype" />
           <property key="Bundle-Name" value="hcp-domain-system" />
+          <property key="Include-Resource" value="OSGI-INF/blueprint/shell-config.xml=$MODULE_DIR$/src/main/resources/OSGI-INF/blueprint/shell-config.xml" />
         </additionalProperties>
         <additionalJARContents />
       </configuration>
@@ -137,36 +138,36 @@
     <orderEntry type="library" name="Maven: org.apache.servicemix.bundles:org.apache.servicemix.bundles.dom4j:1.6.1_5" level="project" />
     <orderEntry type="library" name="Maven: xml-apis:xml-apis:1.0.b2" level="project" />
     <orderEntry type="library" name="Maven: org.osgi:org.osgi.compendium:5.0.0" level="project" />
-    <orderEntry type="library" name="Maven: org.osgi:org.osgi.core:5.0.0" level="project" />
     <orderEntry type="library" name="Maven: com.esotericsoftware:reflectasm:1.11.0" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.21" level="project" />
     <orderEntry type="library" name="Maven: org.onosproject:onlab-misc:1.11.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.onosproject:onlab-rest:1.11.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.onosproject:onlab-osgi:1.11.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.onosproject:onos-cli:1.11.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.onosproject:onos-core-common:1.11.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.onosproject:onos-core-dist:1.11.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.onosproject:onos-core-serializers:1.11.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.onosproject:onos-incubator-api:1.11.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.onosproject:onos-incubator-net:1.11.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.onosproject:onos-incubator-store:1.11.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.commons:commons-math3:3.6.1" level="project" />
-    <orderEntry type="library" name="Maven: com.googlecode.concurrent-trees:concurrent-trees:2.6.0" level="project" />
-    <orderEntry type="library" name="Maven: io.netty:netty-codec:4.1.8.Final" level="project" />
-    <orderEntry type="library" name="Maven: io.netty:netty-handler:4.1.8.Final" level="project" />
-    <orderEntry type="library" name="Maven: io.netty:netty-resolver:4.1.8.Final" level="project" />
-    <orderEntry type="library" name="Maven: io.netty:netty-transport:4.1.8.Final" level="project" />
-    <orderEntry type="library" name="Maven: io.netty:netty-transport-native-epoll:4.1.8.Final" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.karaf.shell:org.apache.karaf.shell.console:3.0.8" level="project" />
-    <orderEntry type="library" name="Maven: jline:jline:2.13" level="project" />
-    <orderEntry type="library" name="Maven: org.fusesource.jansi:jansi:1.11" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.karaf.jaas:org.apache.karaf.jaas.modules:3.0.8" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.karaf.jaas:org.apache.karaf.jaas.config:3.0.8" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.felix:org.apache.felix.fileinstall:3.5.2" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.sshd:sshd-core:0.14.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.onosproject:onos-cli:1.11.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.onosproject:onos-core-common:1.11.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.onosproject:onos-core-dist:1.11.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.onosproject:onos-core-serializers:1.11.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.onosproject:onos-incubator-api:1.11.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.onosproject:onos-incubator-net:1.11.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.onosproject:onos-incubator-store:1.11.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.commons:commons-math3:3.6.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.googlecode.concurrent-trees:concurrent-trees:2.6.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: io.netty:netty-codec:4.1.8.Final" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: io.netty:netty-handler:4.1.8.Final" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: io.netty:netty-resolver:4.1.8.Final" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: io.netty:netty-transport:4.1.8.Final" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: io.netty:netty-transport-native-epoll:4.1.8.Final" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.karaf.shell:org.apache.karaf.shell.console:3.0.8" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: jline:jline:2.13" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.fusesource.jansi:jansi:1.11" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.karaf.jaas:org.apache.karaf.jaas.modules:3.0.8" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.karaf.jaas:org.apache.karaf.jaas.config:3.0.8" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.felix:org.apache.felix.fileinstall:3.5.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.sshd:sshd-core:0.14.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.12" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.onosproject:onos-api:tests:1.11.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.felix:org.apache.felix.scr.annotations:1.9.12" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.osgi:org.osgi.core:5.0.0" level="project" />
   </component>
 </module>

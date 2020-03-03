@@ -1,14 +1,10 @@
 package org.onosproject.system.domain;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import org.apache.felix.scr.annotations.*;
-import org.onosproject.api.Super.HCPSuper;
+import org.onosproject.api.HCPSuper;
 import org.onosproject.api.Super.HCPSuperMessageListener;
 import org.onosproject.api.domain.HCPDomainController;
+import org.onosproject.api.domain.HCPSuperControllerListener;
 import org.onosproject.core.CoreService;
 import org.onosproject.hcp.protocol.*;
 import org.onosproject.hcp.types.DomainId;
@@ -50,6 +46,7 @@ public class HCPDomainControllerImp implements HCPDomainController{
 
    private Set<HCPSuperMessageListener> hcpSuperMessageListeners=new CopyOnWriteArraySet<>();
 
+   private Set<HCPSuperControllerListener> hcpSuperControllerListeners=new CopyOnWriteArraySet<>();
    @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
    protected CoreService coreService;
 
@@ -84,6 +81,8 @@ public class HCPDomainControllerImp implements HCPDomainController{
   @Deactivate
   public void deactivate(){
       hcpSuper=null;
+      hcpSuperMessageListeners.clear();
+      hcpSuperControllerListeners.clear();
       domainConnector.stop();
       log.info("Domain controller stoped");
   }
@@ -102,10 +101,13 @@ public class HCPDomainControllerImp implements HCPDomainController{
     }
 
     @Override
-    public boolean superConnect(HCPSuper hcpSuper) {
-      this.hcpSuper=hcpSuper;
-      return true;
+    public boolean connectToSuperController(HCPSuper hcpSuper) {
+        this.hcpSuper=hcpSuper;
+        for (HCPSuperControllerListener listener:hcpSuperControllerListeners)
+            listener.connectToSuperController(hcpSuper);
+        return true;
     }
+
 
     @Override
     public boolean isConnectToSuper() {
@@ -120,8 +122,18 @@ public class HCPDomainControllerImp implements HCPDomainController{
     }
 
     @Override
-    public void removeMessageListerner(HCPSuperMessageListener listener) {
+    public void removeMessageListener(HCPSuperMessageListener listener) {
         hcpSuperMessageListeners.remove(listener);
+    }
+
+    @Override
+    public void addHCPSuperControllerListener(HCPSuperControllerListener listener) {
+        hcpSuperControllerListeners.add(listener);
+    }
+
+    @Override
+    public void removeHCPSuperControllerListener(HCPSuperControllerListener listener) {
+        hcpSuperControllerListeners.remove(listener);
     }
 
     @Override

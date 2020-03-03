@@ -2,13 +2,12 @@ package org.onosproject.system;
 
 import org.jboss.netty.channel.Channel;
 import org.onlab.packet.IpAddress;
-import org.onosproject.api.Super.HCPSuper;
+import org.onosproject.api.HCPSuper;
 import org.onosproject.api.domain.HCPDomainController;
 import org.onosproject.hcp.protocol.HCPFactories;
 import org.onosproject.hcp.protocol.HCPFactory;
 import org.onosproject.hcp.protocol.HCPMessage;
 import org.onosproject.hcp.protocol.HCPVersion;
-import org.onosproject.system.domain.HCPDomainChannelHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,11 +78,6 @@ public class HCPSuper10 implements HCPSuper{
     public void disConnectSuper() {
         setConnected(false);
         this.channel.close();
-    }
-
-    @Override
-    public boolean connectSuper() {
-        return this.domainController.superConnect(this);
     }
 
     @Override

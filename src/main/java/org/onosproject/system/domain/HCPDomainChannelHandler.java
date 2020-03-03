@@ -3,8 +3,7 @@ package org.onosproject.system.domain;
 import org.jboss.netty.channel.*;
 import org.jboss.netty.handler.timeout.IdleStateAwareChannelHandler;
 import org.jboss.netty.handler.timeout.IdleStateEvent;
-import org.jboss.netty.handler.timeout.IdleStateHandler;
-import org.onosproject.api.Super.HCPSuper;
+import org.onosproject.api.HCPSuper;
 import org.onosproject.api.domain.HCPDomainController;
 import org.onosproject.hcp.protocol.*;
 import org.onosproject.system.HCPSuper10;
@@ -80,7 +79,7 @@ public class HCPDomainChannelHandler extends IdleStateAwareChannelHandler {
                 h.hcPsuper=new HCPSuper10(h.domainController);
                 h.hcPsuper.setChannel(h.channel);
                 h.hcPsuper.setConnected(true);
-                h.hcPsuper.connectSuper();
+                h.domainController.connectToSuperController(h.hcPsuper);
                 h.setState(ACTIVE);
                 }
         },
