@@ -1,4 +1,4 @@
-package org.onosproject.api.Super;
+package org.onosproject.api;
 
 import org.onosproject.hcp.protocol.HCPMessage;
 

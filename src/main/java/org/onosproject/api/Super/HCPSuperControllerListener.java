@@ -1,4 +1,4 @@
-package org.onosproject.api.domain;
+package org.onosproject.api.Super;
 
 import org.onosproject.api.HCPSuper;
 

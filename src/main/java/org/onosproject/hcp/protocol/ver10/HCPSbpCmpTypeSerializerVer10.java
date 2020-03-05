@@ -15,7 +15,8 @@ public class HCPSbpCmpTypeSerializerVer10 {
     public final static byte NORMAL_VAL=0;
     public final static byte FLOWFORWARDING_REQUESR_VAL=1;
     public final static byte FLOWFORWARDING_REPLY_VAL=2;
-    public final static byte PACKET_OUT_VAL=3;
+    public final static byte PACKET_IN_VAL=3;
+    public final static byte PACKET_OUT_VAL=4;
 
     public static HCPSbpCmpType readFrom(ChannelBuffer bb) throws HCPParseError{
         try{
@@ -41,6 +42,8 @@ public class HCPSbpCmpTypeSerializerVer10 {
                 return HCPSbpCmpType.FLOW_FORWARDING_REQUEST;
             case FLOWFORWARDING_REPLY_VAL:
                 return HCPSbpCmpType.FLOW_FORWARDING_REPLY;
+            case PACKET_IN_VAL:
+                return HCPSbpCmpType.PACKET_IN;
             case PACKET_OUT_VAL:
                 return HCPSbpCmpType.PACKET_OUT;
             default:
@@ -56,6 +59,8 @@ public class HCPSbpCmpTypeSerializerVer10 {
                 return FLOWFORWARDING_REQUESR_VAL;
             case FLOW_FORWARDING_REPLY:
                 return FLOWFORWARDING_REPLY_VAL;
+            case PACKET_IN:
+                return PACKET_IN_VAL;
             case PACKET_OUT:
                 return PACKET_OUT_VAL;
             default:

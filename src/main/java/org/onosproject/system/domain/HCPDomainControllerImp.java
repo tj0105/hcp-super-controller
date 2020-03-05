@@ -2,9 +2,9 @@ package org.onosproject.system.domain;
 
 import org.apache.felix.scr.annotations.*;
 import org.onosproject.api.HCPSuper;
-import org.onosproject.api.Super.HCPSuperMessageListener;
+import org.onosproject.api.HCPSuperMessageListener;
 import org.onosproject.api.domain.HCPDomainController;
-import org.onosproject.api.domain.HCPSuperControllerListener;
+import org.onosproject.api.Super.HCPSuperControllerListener;
 import org.onosproject.core.CoreService;
 import org.onosproject.hcp.protocol.*;
 import org.onosproject.hcp.types.DomainId;
@@ -49,13 +49,15 @@ public class HCPDomainControllerImp implements HCPDomainController{
    private Set<HCPSuperControllerListener> hcpSuperControllerListeners=new CopyOnWriteArraySet<>();
    @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
    protected CoreService coreService;
-
   @Activate
   public void activate(){
       this.setHCPVersion(HCPVersion.HCP_10);
-      this.setDomainId(DomainId.of(11111));
+      this.setDomainId(DomainId.of(1111));
+
       this.setHCPSuperIp("192.168.108.100");
+
       this.setHCPSuperPort(8890);
+
       this.setHCPSbpType(HCPSbpType.POF);
       this.setHCPSbpVersion((HCPSbpVersion.of((byte)4,HCPVersion.HCP_10)));
       Set<HCPCapabilities> capabilitie=new HashSet<>();

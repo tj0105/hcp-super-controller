@@ -3,9 +3,9 @@ package org.onosproject.system.domain;
 import org.apache.felix.scr.annotations.*;
 import org.onlab.packet.IpAddress;
 import org.onosproject.api.HCPSuper;
-import org.onosproject.api.Super.HCPSuperMessageListener;
+import org.onosproject.api.HCPSuperMessageListener;
 import org.onosproject.api.domain.HCPDomainController;
-import org.onosproject.api.domain.HCPSuperControllerListener;
+import org.onosproject.api.Super.HCPSuperControllerListener;
 import org.onosproject.hcp.protocol.*;
 import org.onosproject.hcp.types.HCPHost;
 import org.onosproject.hcp.types.IPv4Address;
@@ -62,50 +62,48 @@ public class HCPDomainHostManager {
     }
 
 
-    private void updateExisHosts(){
+    private void updateExisHosts(HCPHostRequest hcpHostRequest){
         List<HCPHost> hcpHosts=new ArrayList<>();
         for (Host host:hostService.getHosts())
-            hcpHosts.addAll(toActivateHCPHost(host));
-        sendHostChangeMessage(hcpHosts);
+            hcpHosts.addAll(toHCPHosts(host,HCPHostState.ACTIVE));
+        sendHostChangeMessage(hcpHosts,hcpHostRequest);
     }
 
     private void updateHost(Host host){
-        sendHostChangeMessage(toActivateHCPHost(host));
+        sendHostChangeMessage(toHCPHosts(host,HCPHostState.ACTIVE),null);
     }
 
     private void removeHost(Host host){
-        sendHostChangeMessage(toInactiveHCPHost(host));
+        sendHostChangeMessage(toHCPHosts(host,HCPHostState.ACTIVE),null);
     }
 
-    private void sendHostChangeMessage(List<HCPHost> hcpHosts){
-        HCPHostUpdate hostUpdate=hcpFactory.buildHostUpdate()
-                .setDomainId(domainController.getDomainId())
-                .setHosts(hcpHosts)
-                .build();
+    private void sendHostChangeMessage(List<HCPHost> hcpHosts,HCPHostRequest hcpHostRequest){
+        HCPMessage hcpMessage=null;
+        if (null != hcpHostRequest){
+            hcpMessage=hcpFactory.buildHostReply()
+                    .setDomainId(domainController.getDomainId())
+                    .setHosts(hcpHosts)
+                    .build();
+        }else{
+            hcpMessage =hcpFactory.buildHostUpdate()
+                    .setDomainId(domainController.getDomainId())
+                    .setHosts(hcpHosts)
+                    .build();
+        }
+
         if (!domainController.isConnectToSuper()){
             return;
         }
         log.info("DomainId: {} host update, num:{}",domainController.getDomainId(),hcpHosts.size());
-        domainController.write(hostUpdate);
+        domainController.write(hcpMessage);
     }
 
-    private List<HCPHost> toActivateHCPHost(Host host){
+    private List<HCPHost> toHCPHosts(Host host,HCPHostState hcpHostState){
         List<HCPHost> hosts=new ArrayList<>();
         for (IpAddress ip:host.ipAddresses()){
             IPv4Address iPv4Address=IPv4Address.of(ip.toOctets());
             MacAddress  macAddress=MacAddress.of(host.mac().toBytes());
-            HCPHost hcpHost=HCPHost.of(iPv4Address,macAddress, HCPHostState.ACTIVE);
-            hosts.add(hcpHost);
-        }
-        return hosts;
-    }
-
-    private List<HCPHost> toInactiveHCPHost(Host host){
-        List<HCPHost> hosts=new ArrayList<>();
-        for (IpAddress ip:host.ipAddresses()){
-            IPv4Address iPv4Address=IPv4Address.of(ip.toOctets());
-            MacAddress  macAddress=MacAddress.of(host.mac().toBytes());
-            HCPHost hcpHost=HCPHost.of(iPv4Address,macAddress, HCPHostState.INACTIVE);
+            HCPHost hcpHost=HCPHost.of(iPv4Address,macAddress, hcpHostState);
             hosts.add(hcpHost);
         }
         return hosts;
@@ -131,12 +129,12 @@ public class HCPDomainHostManager {
                 default:
             }
             if (null != removedHost) {
-                oxpHosts.addAll(toInactiveHCPHost(removedHost));
+                oxpHosts.addAll(toHCPHosts(removedHost,HCPHostState.INACTIVE));
             }
             if (null != updatedHost) {
-                oxpHosts.addAll(toActivateHCPHost(updatedHost));
+                oxpHosts.addAll(toHCPHosts(updatedHost,HCPHostState.ACTIVE));
             }
-            sendHostChangeMessage(oxpHosts);
+            sendHostChangeMessage(oxpHosts,null);
         }
     }
 
@@ -146,7 +144,7 @@ public class HCPDomainHostManager {
         public void handleIncommingMessage(HCPMessage message) {
                 if (message.getType()!=HCPType.HCP_HOST_REQUEST)
                     return;
-                updateExisHosts();
+                updateExisHosts((HCPHostRequest)message);
         }
 
         @Override
@@ -159,7 +157,7 @@ public class HCPDomainHostManager {
 
         @Override
         public void connectToSuperController(HCPSuper hcpSuper) {
-            updateExisHosts();
+            updateExisHosts(null);
         }
 
         @Override

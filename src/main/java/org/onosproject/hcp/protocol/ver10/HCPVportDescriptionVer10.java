@@ -75,7 +75,7 @@ public class HCPVportDescriptionVer10 implements HCPVportDescribtion {
             return new HCPVportDescriptionVer10(vport,state);
         }
     }
-    static class Builder implements HCPVportDescribtion.Builder{
+    public static class Builder implements HCPVportDescribtion.Builder{
         private boolean portNoSet;
         private HCPVport portNo;
         private boolean stateSet;

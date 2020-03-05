@@ -131,6 +131,9 @@ public class HCPSbpVer10  implements HCPSbp{
                 case FLOW_FORWARDING_REQUEST:
                     message.sbpCmpData.writeTo(bb);
                     break;
+                case PACKET_IN:
+                    message.sbpCmpData.writeTo(bb);
+                    break;
                 case PACKET_OUT:
                     message.sbpCmpData.writeTo(bb);
                     break;
@@ -188,8 +191,12 @@ public class HCPSbpVer10  implements HCPSbp{
                 case FLOW_FORWARDING_REQUEST:
                     sbpCmpData=HCPForwardingRequestVer10.read(bb,dataLength);
                     break;
+                case PACKET_IN:
+                    sbpCmpData=HCPPacketInVer10.read(bb,length);
+                    break;
                 case PACKET_OUT:
                     sbpCmpData=HCPPacketOutVer10.read(bb,dataLength);
+                    break;
                 default:
                     throw new IllegalArgumentException("Illegal vaule for sbpcmptype in hcp version 1.0:"+sbpCmpType);
             }

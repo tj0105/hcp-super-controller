@@ -77,6 +77,10 @@ public class HCPVport implements HCPValueType<HCPVport> ,Writeable{
             return name;
         }
     }
+
+    public short getPortNumber(){
+        return portNumber;
+    }
     @Override
     public int getLength() {
         return LENGTH;

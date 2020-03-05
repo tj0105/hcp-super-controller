@@ -1,7 +1,8 @@
 package org.onosproject.api.domain;
 
 import org.onosproject.api.HCPSuper;
-import org.onosproject.api.Super.HCPSuperMessageListener;
+import org.onosproject.api.Super.HCPSuperControllerListener;
+import org.onosproject.api.HCPSuperMessageListener;
 import org.onosproject.hcp.protocol.*;
 import org.onosproject.hcp.types.DomainId;
 
