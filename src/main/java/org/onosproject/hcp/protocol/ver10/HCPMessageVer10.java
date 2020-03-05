@@ -60,7 +60,7 @@ public final class HCPMessageVer10 {
                     return HCPGetConfigRequestVer10.READER.readFrom(bb);
                 case (byte)0x7:
                     // discriminator value HCPType=7 for class HCPGetConfigReplyVer10
-                    return HCPGetConfigRequestVer10.READER.readFrom(bb);
+                    return HCPGetConfigReplyVer10.READER.readFrom(bb);
                 case (byte)0x8:
                     // discriminator value HCPType=8 for class HCPSetConfigVer10
                     return HCPSetConfigVer10.READER.readFrom(bb);

@@ -60,18 +60,18 @@ public class HCPDomainRoutingManager {
 
     @Activate
     public void activate(){
-        hcpVersion=domainController.getHCPVersion();
-        hcpfactory= HCPFactories.getFactory(hcpVersion);
-        packetService.addProcessor(packetProcessor,PacketProcessor.director(4));
-        domainController.addMessageListener(hcpSuperMessageListener);
-        log.info("=======================HCP Domain Routing Manager================");
+//        hcpVersion=domainController.getHCPVersion();
+//        hcpfactory= HCPFactories.getFactory(hcpVersion);
+//        packetService.addProcessor(packetProcessor,PacketProcessor.director(4));
+//        domainController.addMessageListener(hcpSuperMessageListener);
+//        log.info("=======================HCP Domain Routing Manager================");
     }
 
     @Deactivate
     public void deactivate(){
-        packetService.removeProcessor(packetProcessor);
-        domainController.removeMessageListener(hcpSuperMessageListener);
-        log.info("=======================HCP Domain Routing Manager Stopped");
+//        packetService.removeProcessor(packetProcessor);
+//        domainController.removeMessageListener(hcpSuperMessageListener);
+//        log.info("=======================HCP Domain Routing Manager Stopped");
     }
 
     private class ReactivePacketProcessor implements PacketProcessor{

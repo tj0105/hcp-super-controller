@@ -73,8 +73,8 @@ public class HCPGetConfigRequestVer10 implements HCPGetConfigRequest{
                 throw new HCPParseError("Wrong version:Expected=HCPVersion.HCP_10(1), got="+version);
             //type
             byte type=bb.readByte();
-            if (type!=(byte)0x6)
-                throw new HCPParseError("Wrong type:Expected=HCPType.HCP_GET_CONFIG_REQUEST(6),got="+type);
+//            if (type!=(byte)0x6)
+//                throw new HCPParseError("Wrong type:Expected=HCPType.HCP_GET_CONFIG_REQUEST(6),got="+type);
             int length=bb.readShort();
             //xid
             long xid= U32.f(bb.readInt());

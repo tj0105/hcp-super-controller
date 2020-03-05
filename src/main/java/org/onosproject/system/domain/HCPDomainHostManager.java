@@ -44,21 +44,21 @@ public class HCPDomainHostManager {
 
     @Activate
     public void activate(){
-        hcpVersion=domainController.getHCPVersion();
-        hcpFactory= HCPFactories.getFactory(hcpVersion);
-        domainController.addMessageListener(hcpSuperMessageListener);
-        domainController.addHCPSuperControllerListener(hcpSuperControllerListener);
-        hostService.addListener(hostListener);
-        log.info("domainController: superIp:{} superPort{}",domainController.getHCPSuperIp(),domainController.getHCPSuperPort());
+//        hcpVersion=domainController.getHCPVersion();
+//        hcpFactory= HCPFactories.getFactory(hcpVersion);
+//        domainController.addMessageListener(hcpSuperMessageListener);
+//        domainController.addHCPSuperControllerListener(hcpSuperControllerListener);
+//        hostService.addListener(hostListener);
+//        log.info("domainController: superIp:{} superPort{}",domainController.getHCPSuperIp(),domainController.getHCPSuperPort());
     }
 
 
     @Deactivate
     public void deactivate(){
-        hostService.removeListener(hostListener);
-        domainController.removeMessageListener(hcpSuperMessageListener);
-        domainController.removeHCPSuperControllerListener(hcpSuperControllerListener);
-        log.info("hostmanager stoped");
+//        hostService.removeListener(hostListener);
+//        domainController.removeMessageListener(hcpSuperMessageListener);
+//        domainController.removeHCPSuperControllerListener(hcpSuperControllerListener);
+//        log.info("hostmanager stoped");
     }
 
 

@@ -77,23 +77,23 @@ public class HCPDomainTopologyManager implements HCPDomainTopoService{
 
     @Activate
     public void activate(){
-        hcpVersion=domainController.getHCPVersion();
-        hcpFactory= HCPFactories.getFactory(hcpVersion);
-        domainController.addMessageListener(hcpSuperMessageListener);
-        domainController.addHCPSuperControllerListener(hcpSuperControllerListener);
-        linkService.addListener(linkListener);
-        packetService.addProcessor(hcplldpPacketProcesser,PacketProcessor.director(0));
-        log.info("==============Domain Topology Manager Start===================");
+//        hcpVersion=domainController.getHCPVersion();
+//        hcpFactory= HCPFactories.getFactory(hcpVersion);
+//        domainController.addMessageListener(hcpSuperMessageListener);
+//        domainController.addHCPSuperControllerListener(hcpSuperControllerListener);
+//        linkService.addListener(linkListener);
+//        packetService.addProcessor(hcplldpPacketProcesser,PacketProcessor.director(0));
+//        log.info("==============Domain Topology Manager Start===================");
     }
 
     @Deactivate
     public void deactivate(){
-        linkService.removeListener(linkListener);
-        domainController.removeMessageListener(hcpSuperMessageListener);
-        domainController.removeHCPSuperControllerListener(hcpSuperControllerListener);
-        packetService.removeProcessor(hcplldpPacketProcesser);
-        vportMap.clear();
-        log.info("==============Domain Topology Manager Stopped===================");
+//        linkService.removeListener(linkListener);
+//        domainController.removeMessageListener(hcpSuperMessageListener);
+//        domainController.removeHCPSuperControllerListener(hcpSuperControllerListener);
+//        packetService.removeProcessor(hcplldpPacketProcesser);
+//        vportMap.clear();
+//        log.info("==============Domain Topology Manager Stopped===================");
 
     }
 

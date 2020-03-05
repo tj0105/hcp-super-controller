@@ -51,42 +51,42 @@ public class HCPDomainControllerImp implements HCPDomainController{
    protected CoreService coreService;
   @Activate
   public void activate(){
-      this.setHCPVersion(HCPVersion.HCP_10);
-      this.setDomainId(DomainId.of(1111));
-
-      this.setHCPSuperIp("192.168.108.100");
-
-      this.setHCPSuperPort(8890);
-
-      this.setHCPSbpType(HCPSbpType.POF);
-      this.setHCPSbpVersion((HCPSbpVersion.of((byte)4,HCPVersion.HCP_10)));
-      Set<HCPCapabilities> capabilitie=new HashSet<>();
-      capabilitie.add(HCPCapabilities.GROUP_STATS);
-      capabilitie.add(HCPCapabilities.IP_REASM);
-      capabilitie.add(HCPCapabilities.PORT_BLOCKED);
-      capabilitie.add(HCPCapabilities.PORT_STATS);
-      capabilitie.add(HCPCapabilities.QUEUE_STATS);
-      capabilitie.add(HCPCapabilities.FLOW_STATS);
-      capabilitie.add(HCPCapabilities.TABLE_STATS);
-      this.SetCapabilities(capabilitie);
-
-      Set<HCPConfigFlags> flags=new HashSet<>();
-      flags.add(HCPConfigFlags.CAPABILITIES_BW);
-      this.setFlags(flags);
-      this.setPeriod(5);
-      this.setMissSendLength(128);
-      domainConnector.start();
-      log.info("domain controller started");
+//      this.setHCPVersion(HCPVersion.HCP_10);
+//      this.setDomainId(DomainId.of(1111));
+//
+//      this.setHCPSuperIp("192.168.108.100");
+//
+//      this.setHCPSuperPort(8890);
+//
+//      this.setHCPSbpType(HCPSbpType.POF);
+//      this.setHCPSbpVersion((HCPSbpVersion.of((byte)4,HCPVersion.HCP_10)));
+//      Set<HCPCapabilities> capabilitie=new HashSet<>();
+//      capabilitie.add(HCPCapabilities.GROUP_STATS);
+//      capabilitie.add(HCPCapabilities.IP_REASM);
+//      capabilitie.add(HCPCapabilities.PORT_BLOCKED);
+//      capabilitie.add(HCPCapabilities.PORT_STATS);
+//      capabilitie.add(HCPCapabilities.QUEUE_STATS);
+//      capabilitie.add(HCPCapabilities.FLOW_STATS);
+//      capabilitie.add(HCPCapabilities.TABLE_STATS);
+//      this.SetCapabilities(capabilitie);
+//
+//      Set<HCPConfigFlags> flags=new HashSet<>();
+//      flags.add(HCPConfigFlags.CAPABILITIES_BW);
+//      this.setFlags(flags);
+//      this.setPeriod(5);
+//      this.setMissSendLength(128);
+//      domainConnector.start();
+//      log.info("domain controller started");
 
   }
 
   @Deactivate
   public void deactivate(){
-      hcpSuper=null;
-      hcpSuperMessageListeners.clear();
-      hcpSuperControllerListeners.clear();
-      domainConnector.stop();
-      log.info("Domain controller stoped");
+//      hcpSuper=null;
+//      hcpSuperMessageListeners.clear();
+//      hcpSuperControllerListeners.clear();
+//      domainConnector.stop();
+//      log.info("Domain controller stoped");
   }
    @Override
     public void processMessage(HCPMessage message) {

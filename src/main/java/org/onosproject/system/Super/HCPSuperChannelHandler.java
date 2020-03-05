@@ -51,6 +51,7 @@ public class HCPSuperChannelHandler extends IdleStateAwareChannelHandler {
                     h.hcpDomain=new HCPDomain10(h.hcpSuperController);
                     h.hcpDomain.setHCPVersion(h.hcpVersion);
                     h.sendHandShakeHelloMessage();
+                    log.info("SuperController Received HCPhello message {} {}",m.getVersion(),m.getXid());
                 }else {
                     log.error("Received Hello of version from hcp domain controller at {}" +
                             "{},but this DomainController work with HCP_10.HCPDomainController" +
@@ -68,8 +69,11 @@ public class HCPSuperChannelHandler extends IdleStateAwareChannelHandler {
         WAIT_FEATURES_REPLY(false){
             @Override
             void processHCPFeatureReply(HCPSuperChannelHandler h, HCPFeaturesReply m) {
+                log.info("SuperController Received HCPFeaturesReply message {} {}",m.getDomainId(),m.getCapabilities().toString());
+                log.info("==============={}==============",m.getDomainId().toString());
                 h.hcpDomain.setDomainId(m.getDomainId());
-                h.hcpDomain.setDeviceId(DeviceId.deviceId("hcp:"+h.hcpDomain.getDeviceId().toString()));
+                log.info("==============={}==============",h.hcpDomain.getDomainId().toString());
+                h.hcpDomain.setDeviceId(DeviceId.deviceId("hcp:"+h.hcpDomain.getDomainId().toString()));
                 h.hcpDomain.setCapabilities(m.getCapabilities());
                 h.hcpDomain.setHCPSbpType(m.getSbpType());
                 h.hcpDomain.setHCPSbpVersion(m.getSbpVersion());
@@ -85,6 +89,7 @@ public class HCPSuperChannelHandler extends IdleStateAwareChannelHandler {
         WAIT_GET_CONFIG_REPLY(false){
             @Override
             void processHCPGetConfigReply(HCPSuperChannelHandler h, HCPGetConfigReply m) {
+                log.info("SuperController Received HCPGetConfigReply message {} {}",m.getPeriod(),m.getFlags().toString());
                 h.hcpDomain.setFlags(m.getFlags());
                 h.hcpDomain.setPeriod(m.getPeriod());
                 h.hcpDomain.setMissSendLength(m.getMissSendLength());
@@ -243,15 +248,19 @@ public class HCPSuperChannelHandler extends IdleStateAwareChannelHandler {
     }
 
     private void sendHandShakeFeaturesRequestMessage(){
+        log.info("Start send FeaturesRequest message");
         HCPMessage.Builder mb=hcpFactory.buildFeaturesRequest()
                 .setXid(this.handshakeTransactions--);
+        log.info("Send HCP_10 FeaturesRequest to Domain Controller: {} ",channel.getRemoteAddress());
         channel.write(Collections.singletonList(mb.build()));
     }
 
     private void sendHandShakeGetConfigRequestMessage(){
         HCPMessage.Builder mb=hcpFactory.buildGetConfitRequest()
                 .setXid(this.handshakeTransactions--);
+        log.info("Send HCP_10 GetConfigRequest to Domain Controller: {} ",channel.getRemoteAddress());
         channel.write(Collections.singletonList(mb.build()));
+        log.info("Send HCP_10 GetConfigRequest to Domain Controller: {} ",channel.getRemoteAddress());
     }
 
     private void setState(ChannelState state){
@@ -260,6 +269,7 @@ public class HCPSuperChannelHandler extends IdleStateAwareChannelHandler {
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+        log.info("MessengEvent message: {}",e.getMessage());
         if (e.getMessage() instanceof List){
             List<HCPMessage> messages=(List<HCPMessage>)e.getMessage();
             for (HCPMessage m:messages ){

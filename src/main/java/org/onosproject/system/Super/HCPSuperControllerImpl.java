@@ -44,15 +44,17 @@ public class HCPSuperControllerImpl implements HCPSuperController {
 
     @Activate
     public void acticate(){
-//        domainMap=new HashMap<>();
-//        connector.start();
-//        log.info("====================HCPSuperController Started=================");
+        hcpVersion=HCPVersion.HCP_10;
+        domainMap=new HashMap<>();
+        connector.start();
+        log.info("====================HCPSuperController Started=================");
     }
     @Deactivate
     public void deactivate(){
-//        connector.stop();
-//        domainMap.clear();
-//        log.info("========================HCPSuperController stopped================");
+        log.info("Domain controller size:{} Domain Controller Channel {}",domainMap.size(),domainMap.get(DomainId.of(1111)).channleId());
+        connector.stop();
+        domainMap.clear();
+        log.info("========================HCPSuperController stopped================");
     }
 
 
