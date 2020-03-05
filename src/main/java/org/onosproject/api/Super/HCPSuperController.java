@@ -36,8 +36,8 @@ public interface HCPSuperController {
     void addDomain(DomainId domainId,HCPDomain domain);
     void removeDomain(DomainId domainId);
 
-    void processDownstremMessage(List<HCPMessage> messages);
-    void processMessage(HCPMessage message);
+    void processDownstremMessage(DomainId domainId,List<HCPMessage> messages);
+    void processMessage(DomainId domainId,HCPMessage message);
 
     HCPDomain getHCPDomain(DomainId domainId);
 

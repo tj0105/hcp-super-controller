@@ -9,7 +9,7 @@ import org.junit.Test;
  */
 public class HexTest {
     @Test
-    public static void main(String[] args) {
+    public  void main() {
         System.out.println(String.format("%06x",2222));
     }
 }
