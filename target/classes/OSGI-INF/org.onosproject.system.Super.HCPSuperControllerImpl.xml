@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.onosproject.system.Super.HCPSuperControllerImpl" activate="acticate" deactivate="deactivate">
-    <implementation class="org.onosproject.system.Super.HCPSuperControllerImpl"/>
-    <service servicefactory="false">
-        <provide interface="org.onosproject.api.Super.HCPSuperController"/>
-    </service>
-    <property name="service.pid" value="org.onosproject.system.Super.HCPSuperControllerImpl"/>
-</scr:component>

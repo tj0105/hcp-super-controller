@@ -9,6 +9,7 @@ import org.jboss.netty.util.ExternalResourceReleasable;
 import org.jboss.netty.util.HashedWheelTimer;
 import org.jboss.netty.util.Timer;
 import org.onosproject.api.Super.HCPSuperController;
+import org.onosproject.floodlightpof.protocol.OFMatch;
 import org.onosproject.system.HCPMessageDecoder;
 import org.onosproject.system.HCPMessageEncoder;
 import org.slf4j.Logger;
