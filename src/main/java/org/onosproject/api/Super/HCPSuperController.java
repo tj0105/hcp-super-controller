@@ -1,5 +1,6 @@
 package org.onosproject.api.Super;
 
+import org.onlab.packet.Ethernet;
 import org.onosproject.api.HCPDomain;
 import org.onosproject.api.HCPDomainMessageListener;
 import org.onosproject.api.domain.HCPDomainListener;
@@ -9,6 +10,7 @@ import org.onosproject.hcp.types.DomainId;
 
 import javax.validation.constraints.Max;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Author ldy
@@ -40,5 +42,9 @@ public interface HCPSuperController {
     void processMessage(DomainId domainId,HCPMessage message);
 
     HCPDomain getHCPDomain(DomainId domainId);
+    HCPDomain getHCPDomain(String domainId);
+    HCPDomain getHCPDomain(long domainId);
 
+    Set<HCPDomain> getDomains();
+    Ethernet parseEthernet(byte []data);
 }

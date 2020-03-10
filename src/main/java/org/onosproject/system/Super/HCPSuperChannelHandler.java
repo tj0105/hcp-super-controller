@@ -50,6 +50,10 @@ public class HCPSuperChannelHandler extends IdleStateAwareChannelHandler {
                     h.hcpFactory=HCPFactories.getFactory(h.hcpVersion);
                     h.hcpDomain=new HCPDomain10(h.hcpSuperController);
                     h.hcpDomain.setHCPVersion(h.hcpVersion);
+                    String [] IpAndPort=h.channel.getRemoteAddress().toString()
+                            .substring("/".length()).split(":");
+                    h.hcpDomain.setDomainIp(IpAndPort[0]);
+                    h.hcpDomain.setDomainPort(Integer.valueOf(IpAndPort[1]));
                     h.sendHandShakeHelloMessage();
                     log.info("SuperController Received HCPhello message {} {}",m.getVersion(),m.getXid());
                 }else {

@@ -84,5 +84,6 @@ public class HCPSuperConnector {
         log.info("Stopping HCPSuperController ");
         channelGroup.close();
         execfactory.shutdown();
+        execfactory.releaseExternalResources();
     }
 }

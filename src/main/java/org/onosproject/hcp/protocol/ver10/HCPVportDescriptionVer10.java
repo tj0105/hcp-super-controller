@@ -64,7 +64,7 @@ public class HCPVportDescriptionVer10 implements HCPVportDescribtion {
         }
     }
 
-    static final Reader READER=new Reader();
+    public static final Reader READER=new Reader();
     static class Reader implements HCPMessageReader<HCPVportDescribtion>{
 
         @Override

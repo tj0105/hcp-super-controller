@@ -29,7 +29,7 @@ public class HCPMessageEncoder extends OneToOneEncoder{
         ChannelBuffer buffer= ChannelBuffers.dynamicBuffer();
         for(HCPMessage hcpMessage:msgList){
             if (hcpMessage!=null){
-                log.info("===============Encode Message========={}==========",hcpMessage.getType());
+//                log.info("===============Encode Message========={}==========",hcpMessage.getType());
                 hcpMessage.writeTo(buffer);
             }
         }

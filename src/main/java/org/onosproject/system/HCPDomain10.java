@@ -35,8 +35,8 @@ public class HCPDomain10 implements HCPDomain{
     private HCPSuper hcpSuper;
     private HCPVersion hcpVersion;
     private HCPSuperController superController;
-    private int hcpsuperport=0;
-    private String hcpsuperIp=null;
+    private int hcpdomainport=0;
+    private String hcpdomainIp=null;
     private String ChannelId;
     private Channel channel;
 
@@ -55,7 +55,7 @@ public class HCPDomain10 implements HCPDomain{
         }
     }
     @Override
-    public void sendMsg(HCPMessage message) {
+    synchronized public void sendMsg(HCPMessage message) {
         this.sendMessageOnChanel(Collections.singletonList(message));
     }
 
@@ -175,23 +175,23 @@ public class HCPDomain10 implements HCPDomain{
     }
 
     @Override
-    public int getHCPSuperPort() {
-       return hcpsuperport;
+    public int getDomainPort() {
+       return hcpdomainport;
     }
 
     @Override
-    public void setHCPSuperPort(int hcpSuperPort) {
-        this.hcpsuperport=hcpSuperPort;
+    public void setDomainPort(int hcpSuperPort) {
+        this.hcpdomainport=hcpSuperPort;
     }
 
     @Override
-    public String getHCPSuperIp() {
-        return hcpsuperIp;
+    public String getDomainIp() {
+        return hcpdomainIp;
     }
 
     @Override
-    public void setHCPSuperIp(String hcpSuperIp) {
-        this.hcpsuperIp=hcpSuperIp;
+    public void setDomainIp(String hcpSuperIp) {
+        this.hcpdomainIp=hcpSuperIp;
     }
 
     @Override

@@ -1,9 +1,15 @@
 package org.onosproject.system.Super;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Service;
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
+import org.onlab.packet.DeserializationException;
+import org.onlab.packet.Ethernet;
 import org.onosproject.api.HCPDomain;
 import org.onosproject.api.HCPDomainMessageListener;
 import org.onosproject.api.Super.HCPSuperController;
@@ -152,5 +158,40 @@ public class HCPSuperControllerImpl implements HCPSuperController {
     @Override
     public HCPDomain getHCPDomain(DomainId domainId) {
         return domainMap.get(domainId);
+    }
+
+    @Override
+    public HCPDomain getHCPDomain(String domainId) {
+        for (DomainId domainId1:domainMap.keySet()){
+            if (domainId1.toString().equals(domainId)){
+                return domainMap.get(domainId1);
+            }
+        }
+        return null;
+    }
+    @Override
+    public HCPDomain getHCPDomain(long domainId) {
+        for (DomainId domainId1:domainMap.keySet()){
+            if (domainId1.getLong()==domainId){
+                return domainMap.get(domainId1);
+            }
+        }
+        return null;
+    }
+    @Override
+    public Set<HCPDomain> getDomains() {
+        return ImmutableSet.copyOf(domainMap.values());
+    }
+
+    @Override
+    public Ethernet parseEthernet(byte data[]) {
+        ChannelBuffer buffer = ChannelBuffers.copiedBuffer(data);
+        Ethernet eth = null;
+        try {
+            eth = Ethernet.deserializer().deserialize(buffer.array(), 0, buffer.readableBytes());
+        } catch (DeserializationException e) {
+            return null;
+        }
+        return eth;
     }
 }

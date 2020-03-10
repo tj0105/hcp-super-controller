@@ -54,11 +54,11 @@ public interface HCPDomain {
     HCPSbpVersion getHCPSbpVersion();
     void setHCPSbpVersion(HCPSbpVersion hcpSbpVersion);
 
-    int getHCPSuperPort();
-    void setHCPSuperPort(int hcpSuperPort);
+    int getDomainPort();
+    void setDomainPort(int hcpDomainPort);
 
-    String getHCPSuperIp();
-    void setHCPSuperIp(String hcpSuperIp);
+    String getDomainIp();
+    void setDomainIp(String hcpDomainIp);
 
     HCPVersion getHCPVersion();
     void setHCPVersion(HCPVersion hcpVersion);

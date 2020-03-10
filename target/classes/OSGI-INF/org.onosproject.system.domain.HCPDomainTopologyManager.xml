@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.onosproject.system.domain.HCPDomainTopologyManager" activate="activate" deactivate="deactivate">
+    <implementation class="org.onosproject.system.domain.HCPDomainTopologyManager"/>
+    <service servicefactory="false">
+        <provide interface="org.onosproject.api.domain.HCPDomainTopoService"/>
+    </service>
+    <property name="service.pid" value="org.onosproject.system.domain.HCPDomainTopologyManager"/>
+    <reference name="packetService" interface="org.onosproject.net.packet.PacketService" cardinality="1..1" policy="static" bind="bindPacketService" unbind="unbindPacketService"/>
+    <reference name="linkService" interface="org.onosproject.net.link.LinkService" cardinality="1..1" policy="static" bind="bindLinkService" unbind="unbindLinkService"/>
+    <reference name="domainController" interface="org.onosproject.api.domain.HCPDomainController" cardinality="1..1" policy="static" bind="bindDomainController" unbind="unbindDomainController"/>
+    <reference name="hostService" interface="org.onosproject.net.host.HostService" cardinality="1..1" policy="static" bind="bindHostService" unbind="unbindHostService"/>
+    <reference name="clusterMetadataService" interface="org.onosproject.cluster.ClusterMetadataService" cardinality="1..1" policy="static" bind="bindClusterMetadataService" unbind="unbindClusterMetadataService"/>
+</scr:component>
