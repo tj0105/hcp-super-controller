@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.onosproject.system.domain.HCPDomainHostManager" activate="activate" deactivate="deactivate">
-    <implementation class="org.onosproject.system.domain.HCPDomainHostManager"/>
-    <property name="service.pid" value="org.onosproject.system.domain.HCPDomainHostManager"/>
-    <reference name="hostService" interface="org.onosproject.net.host.HostService" cardinality="1..1" policy="static" bind="bindHostService" unbind="unbindHostService"/>
-    <reference name="domainController" interface="org.onosproject.api.domain.HCPDomainController" cardinality="1..1" policy="static" bind="bindDomainController" unbind="unbindDomainController"/>
-</scr:component>

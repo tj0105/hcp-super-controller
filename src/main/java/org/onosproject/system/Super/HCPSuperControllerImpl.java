@@ -12,8 +12,11 @@ import org.onlab.packet.DeserializationException;
 import org.onlab.packet.Ethernet;
 import org.onosproject.api.HCPDomain;
 import org.onosproject.api.HCPDomainMessageListener;
+import org.onosproject.api.HCPSuper;
 import org.onosproject.api.Super.HCPSuperController;
 import org.onosproject.api.domain.HCPDomainListener;
+import org.onosproject.hcp.protocol.HCPFactories;
+import org.onosproject.hcp.protocol.HCPFactory;
 import org.onosproject.hcp.protocol.HCPMessage;
 import org.onosproject.hcp.protocol.HCPVersion;
 import org.onosproject.hcp.types.DomainId;
@@ -46,11 +49,14 @@ public class HCPSuperControllerImpl implements HCPSuperController {
     protected String HCPSuperIP="127.0.0.1";
     protected int HCPSuperPort=8899;
     private HCPVersion hcpVersion;
-
+    private HCPFactory hcpFactory;
 
     @Activate
-    public void acticate(){
-        hcpVersion=HCPVersion.HCP_10;
+    public void activate(){
+        this.setHCPVersion(HCPVersion.HCP_10);
+        this.setHCPSuperPort(HCPSuperPort);
+        this.setHCPSuperPort(HCPSuperPort);
+        hcpFactory=HCPFactories.getFactory(hcpVersion);
         domainMap=new HashMap<>();
         connector.start();
         log.info("====================HCPSuperController Started=================");

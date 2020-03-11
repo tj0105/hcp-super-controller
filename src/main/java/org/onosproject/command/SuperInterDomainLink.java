@@ -5,18 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.karaf.shell.commands.Command;
 import org.onlab.util.Tools;
-import org.onosproject.api.HCPSuper;
 import org.onosproject.api.Super.HCPSuperTopoServices;
-import org.onosproject.api.domain.HCPDomainController;
 import org.onosproject.cli.AbstractShellCommand;
 import org.onosproject.net.Link;
 import org.onosproject.net.LinkKey;
-import org.onosproject.system.domain.HCPDomainControllerImp;
 
 import java.util.Comparator;
-import java.util.List;
-
-import static org.onosproject.cli.net.LinksListCommand.linkString;
 
 /**
  * @Author ldy

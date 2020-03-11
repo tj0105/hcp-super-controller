@@ -8,6 +8,7 @@ import org.onosproject.hcp.protocol.*;
 import org.onosproject.hcp.protocol.ver10.HCPVportDescriptionVer10;
 import org.onosproject.hcp.protocol.ver10.HCPVportStatusVer10;
 import org.onosproject.hcp.types.HCPVport;
+import org.onosproject.net.PortNumber;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,42 +29,44 @@ public class HCPVportStatusTest {
     @Test
     public void testVPortStatus() throws HCPParseError {
         long domaini=0;
-        System.out.println(domaini);
+        PortNumber portNumber=PortNumber.portNumber(1);
+
+        System.out.println(portNumber);
         ChannelBuffer buffer = ChannelBuffers.dynamicBuffer();
         HCPVport vport = HCPVport.ofShort((short) 1);
         Set<HCPVportState> state = new HashSet<>();
         state.add(HCPVportState.LINK_UP);
-        for (HCPVportState hcpVportState:state){
-            System.out.println(hcpVportState);
-        }
+//        for (HCPVportState hcpVportState:state){
+//            System.out.println(hcpVportState);
+//        }
         HCPVportDescribtion vportDesc = new HCPVportDescriptionVer10.Builder()
                 .setPortNo(vport)
                 .setState(state)
                 .build();
-        vportDesc.writeTo(buffer);
+//        vportDesc.writeTo(buffer);
 
-      HCPMessageReader<HCPVportDescribtion> w=HCPVportDescriptionVer10.READER;
-      HCPVportDescribtion describtion=w.readFrom(buffer);
-        System.out.println(describtion.getPortNo());
-        System.out.println(describtion.getState());
-//        HCPVportStatus vportStatus = getMessageFactry()
-//                .buildVportStatus()
-//                .setReson(HCPVportReason.ADD)
-//                .setVportDescribtion(vportDesc)
-//                .build();
-//        vportStatus.writeTo(buffer);
-//        assertThat(vportStatus, instanceOf(HCPVportStatusVer10.class));
-//
-//        HCPMessage message = getMessageReader().readFrom(buffer);
-//        assertThat(message, instanceOf(vportStatus.getClass()));
-//
-//        HCPVportStatus messageRev =  vportStatus;
-//        System.out.println(messageRev.getType());
-//        System.out.println(messageRev.getXid());
-//        System.out.println(messageRev.getReason());
-//        System.out.println(messageRev.getVportDescribtion().getState()+""
-//                +messageRev.getVportDescribtion().getPortNo().getPortNumber());
-//        System.out.println(messageRev.getXid());
-//        assertThat(vportStatus, is(messageRev));
+//      HCPMessageReader<HCPVportDescribtion> w=HCPVportDescriptionVer10.READER;
+//      HCPVportDescribtion describtion=w.readFrom(buffer);
+//        System.out.println(describtion.getPortNo());
+//        System.out.println(describtion.getState());
+        HCPVportStatus vportStatus = getMessageFactry()
+                .buildVportStatus()
+                .setReson(HCPVportReason.ADD)
+                .setVportDescribtion(vportDesc)
+                .build();
+        vportStatus.writeTo(buffer);
+        assertThat(vportStatus, instanceOf(HCPVportStatusVer10.class));
+
+        HCPMessage message = getMessageReader().readFrom(buffer);
+        assertThat(message, instanceOf(vportStatus.getClass()));
+
+        HCPVportStatus messageRev =  (HCPVportStatus)message;
+        System.out.println(messageRev.getType());
+        System.out.println(messageRev.getXid());
+        System.out.println(messageRev.getReason());
+        System.out.println(messageRev.getVportDescribtion().getState()+""
+                +messageRev.getVportDescribtion().getPortNo().getPortNumber());
+        System.out.println(messageRev.getXid());
+        assertThat(vportStatus, is(messageRev));
     }
 }

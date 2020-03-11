@@ -14,15 +14,18 @@ import org.onosproject.api.domain.HCPDomainListener;
 import org.onosproject.hcp.protocol.*;
 import org.onosproject.hcp.types.DomainId;
 import org.onosproject.hcp.types.HCPHost;
+import org.onosproject.hcp.types.HCPInternalLink;
+import org.onosproject.hcp.types.HCPVport;
 import org.onosproject.net.*;
 import org.onosproject.net.provider.ProviderId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.channels.Channel;
+import java.nio.channels.ConnectionPendingException;
 import java.util.*;
 
-@Component
+@Component(immediate = true)
 @Service
 public class HCPSuperTopologyManager implements HCPSuperTopoServices {
     private static final Logger log= LoggerFactory.getLogger(HCPSuperTopologyManager.class);
@@ -39,32 +42,47 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
     //记录VPort和Domain
     private Map<DomainId,Set<PortNumber>> vportMap;
     private Map<ConnectPoint,HCPVportDescribtion> vportDescribtionMap;
+    private Map<ConnectPoint,Long> vportMaxCapability;
+    private Map<ConnectPoint,Long> vportLoadCapability;
 
     //记录域间link
     private Set<Link> InterDomainLink;
     private ProviderId interDomainLinkProviderId=ProviderId.NONE;
 
+    //记录域内link
+    private Map<DomainId,Set<Link>> IntraDomainLink;
+    private Map<Link,HCPInternalLink>IntraDomainLinkDescription;
+
     //记录hostId and Localcation
     private Map<DomainId,Map<HostId,HCPHost>> hostMap;
+
     @Activate
     public void activate(){
         vportMap=new HashMap<>();
         vportDescribtionMap=new HashMap<>();
         InterDomainLink=new HashSet<>();
         hostMap=new HashMap<>();
+        vportLoadCapability=new HashMap<>();
+        vportMaxCapability=new HashMap<>();
+        IntraDomainLink=new HashMap<>();
+        IntraDomainLinkDescription=new HashMap<>();
         superController.addMessageListener(domainMessageListener);
         superController.addHCPDomainListener(domainListener);
         log.info("============HCPSuperController Topology Manager started==========");
     }
 
     @Deactivate
-    public void Deactive(){
+    public void deactive(){
         superController.removeHCPDomainListener(domainListener);
         superController.removeMessageListener(domainMessageListener);
         vportDescribtionMap.clear();
         vportMap.clear();
         InterDomainLink.clear();
         hostMap.clear();
+        vportMaxCapability.clear();
+        vportLoadCapability.clear();
+        IntraDomainLinkDescription.clear();
+        IntraDomainLink.clear();
         log.info("============HCPSuperController Topology Manager stopped==========");
     }
 
@@ -138,8 +156,10 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
             vportSet.add(VportNumber);
             vportDescribtionMap.put(connectPoint,Vportdescribtion);
         }
+        log.info("=============Vport========{}====",vportMap.get(domainId).toString());
     }
     private void processHostUpdateandReply(DomainId domainId, List<HCPHost> hcpHosts){
+        log.info("=================hcpHost=========={}",hcpHosts.size());
         Map<HostId,HCPHost> map=hostMap.get(domainId);
         if (map==null){
             map=new HashMap<>();
@@ -150,9 +170,12 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
             if (hcpHost.getHostState().equals(HCPHostState.ACTIVE)){
                 map.put(hostId,hcpHost);
             }else{
+                log.info("1111111111111111111111111111111111111111111111");
                 map.remove(hostId);
             }
         }
+        Set<HCPHost> hosts=getHostByDomainId(domainId);
+        log.info("===================Host======={}=======",hosts.size());
 
     }
     private void processVportStatusMessage(DomainId domainId,HCPVportStatus hcpVportStatus){
@@ -170,6 +193,36 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
                 throw new IllegalArgumentException("Illegal vport status for reason type ="+hcpVportStatus.getReason());
         }
     }
+
+    private void processTopologyReply(DomainId domainId, List<HCPInternalLink> internalLinkList){
+        Set<Link> linkSet=new HashSet<>();
+        DeviceId deviceId=getDeviceId(domainId);
+        for (HCPInternalLink internalLink:internalLinkList){
+            PortNumber srcPortNumber=PortNumber.portNumber(internalLink.getSrcVPort().getPortNumber());
+            PortNumber dstPortNumber=PortNumber.portNumber(internalLink.getDstVport().getPortNumber());
+            ConnectPoint srcConn=new ConnectPoint(deviceId,srcPortNumber);
+            ConnectPoint dstConn=new ConnectPoint(deviceId,dstPortNumber);
+            if (srcPortNumber.equals(dstPortNumber)){
+                vportMaxCapability.put(srcConn,internalLink.getCapability());
+                continue;
+            }
+            if (internalLink.getDstVport().equals(HCPVport.LOCAL)){
+                vportLoadCapability.put(srcConn,internalLink.getCapability());
+                continue;
+            }
+            Link link=DefaultLink.builder()
+                    .src(srcConn)
+                    .dst(dstConn)
+                    .providerId(interDomainLinkProviderId)
+                    .type(Link.Type.DIRECT)
+                    .state(Link.State.ACTIVE)
+                    .build();
+            linkSet.add(link);
+            IntraDomainLinkDescription.put(link,internalLink);
+        }
+        IntraDomainLink.put(domainId,linkSet);
+    }
+
     private void processHCPLLDP(DomainId domainId,Ethernet ethernet,PortNumber portNumber){
         HCPLLDP hcplldp=HCPLLDP.parseHCPLLDP(ethernet);
         if (null==hcplldp){
@@ -214,6 +267,10 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
                     HCPHostUpdate hostUpdate=(HCPHostUpdate) message;
                     processHostUpdateandReply(domainId,hostUpdate.getHosts());
                 }
+                if (message.getType()==HCPType.HCP_TOPO_REPLY){
+                    HCPTopologyReply topologyReply=(HCPTopologyReply) message;
+                    processTopologyReply(domainId,topologyReply.getInternalLink());
+                }
                 if (message.getType()==HCPType.HCP_SBP){
                     HCPSbp hcpSbp=(HCPSbp)message ;
                     Ethernet eth=null;
@@ -250,7 +307,20 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
 
         @Override
         public void domainDisConnected(HCPDomain domain) {
-            return ;
+            for (PortNumber portNumber:vportMap.get(domain.getDomainId())){
+                ConnectPoint vportLocation=new ConnectPoint(domain.getDeviceId(),portNumber);
+                vportDescribtionMap.remove(vportLocation);
+                vportMaxCapability.remove(vportLocation);
+                vportLoadCapability.remove(vportLocation);
+            }
+            vportMap.remove(domain.getDomainId());
+            for (Link link:getInterDomainLink()){
+                if (link.dst().deviceId().equals(domain.getDeviceId())
+                        ||link.src().deviceId().equals(domain.getDeviceId())){
+                    InterDomainLink.remove(link);
+                }
+            }
+            hostMap.remove(domain.getDomainId());
         }
     }
 }

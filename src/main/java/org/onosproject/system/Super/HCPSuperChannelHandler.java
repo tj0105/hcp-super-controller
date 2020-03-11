@@ -273,7 +273,7 @@ public class HCPSuperChannelHandler extends IdleStateAwareChannelHandler {
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        log.info("MessengEvent message: {}",e.getMessage());
+//        log.info("MessengEvent message: {}",e.getMessage());
         if (e.getMessage() instanceof List){
             List<HCPMessage> messages=(List<HCPMessage>)e.getMessage();
             for (HCPMessage m:messages ){
