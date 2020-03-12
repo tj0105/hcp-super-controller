@@ -3,6 +3,7 @@ package org.onosproject.api.Super;
 import org.onosproject.hcp.protocol.HCPVportDescribtion;
 import org.onosproject.hcp.types.DomainId;
 import org.onosproject.hcp.types.HCPHost;
+import org.onosproject.hcp.types.HCPInternalLink;
 import org.onosproject.net.DeviceId;
 import org.onosproject.net.Link;
 import org.onosproject.net.PortNumber;
@@ -21,5 +22,7 @@ public interface HCPSuperTopoServices {
 
     Set<HCPHost> getHostByDomainId(DomainId domainId);
 
+    Set<Link>  getIntraDomainLink(DomainId domainId);
 
+    HCPInternalLink getinternalLinkDesc(Link link);
 }

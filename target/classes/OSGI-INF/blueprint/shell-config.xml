@@ -31,6 +31,9 @@
         <command>
             <action class="org.onosproject.command.SuperVportListCommand"/>
         </command>
+        <command>
+            <action class="org.onosproject.command.SuperIntraDomainLink"/>
+        </command>
     </command-bundle>
 
 </blueprint>
