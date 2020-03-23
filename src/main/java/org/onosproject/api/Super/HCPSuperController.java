@@ -7,6 +7,8 @@ import org.onosproject.api.domain.HCPDomainListener;
 import org.onosproject.hcp.protocol.HCPMessage;
 import org.onosproject.hcp.protocol.HCPVersion;
 import org.onosproject.hcp.types.DomainId;
+import org.onosproject.net.Device;
+import org.onosproject.net.DeviceId;
 
 import javax.validation.constraints.Max;
 import java.util.List;
@@ -47,4 +49,7 @@ public interface HCPSuperController {
 
     Set<HCPDomain> getDomains();
     Ethernet parseEthernet(byte []data);
+
+    Set<Device> getDevices();
+    Device getDevice(DeviceId deviceId);
 }

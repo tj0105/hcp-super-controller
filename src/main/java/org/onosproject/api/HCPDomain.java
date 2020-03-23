@@ -16,6 +16,7 @@ import java.util.Set;
  */
 public interface HCPDomain {
     void sendMsg(HCPMessage message);
+
     void sendMsg(List<HCPMessage> messageList);
 
     void handleMessage(HCPMessage message);

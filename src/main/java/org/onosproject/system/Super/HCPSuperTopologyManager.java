@@ -5,19 +5,19 @@ import com.google.common.collect.ImmutableSet;
 import org.apache.felix.scr.annotations.*;
 import org.onlab.packet.Ethernet;
 import org.onlab.packet.HCPLLDP;
+import org.onlab.packet.IpAddress;
 import org.onlab.packet.MacAddress;
 import org.onosproject.api.HCPDomain;
 import org.onosproject.api.HCPDomainMessageListener;
 import org.onosproject.api.Super.HCPSuperController;
 import org.onosproject.api.Super.HCPSuperTopoServices;
 import org.onosproject.api.domain.HCPDomainListener;
+import org.onosproject.common.DefaultTopology;
 import org.onosproject.hcp.protocol.*;
-import org.onosproject.hcp.types.DomainId;
-import org.onosproject.hcp.types.HCPHost;
-import org.onosproject.hcp.types.HCPInternalLink;
-import org.onosproject.hcp.types.HCPVport;
+import org.onosproject.hcp.types.*;
 import org.onosproject.net.*;
 import org.onosproject.net.provider.ProviderId;
+import org.onosproject.net.topology.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +32,10 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
 
     @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
     private HCPSuperController superController;
+
+    @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
+    private TopologyService topologyService;
+
 
     //监听DomainController发送过来的VPortStatus,
     // Topo,Host,Sbp等消息，完成拓扑的构建
@@ -55,6 +59,11 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
 
     //记录hostId and Localcation
     private Map<DomainId, Map<HostId, HCPHost>> hostMap;
+
+    //构造一个网络拓扑
+    private volatile DefaultTopology SuperTopology=new DefaultTopology(
+                        ProviderId.NONE,new DefaultGraphDescription(0L,System.currentTimeMillis(),
+                                     Collections.<Device>emptyList(),Collections.<Link>emptyList()));
 
     @Activate
     public void activate() {
@@ -129,7 +138,64 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
         return IntraDomainLinkDescription.get(link);
     }
 
+    @Override
+    public Set<HCPHost> getHostByIp(IpAddress ipAddress) {
+        IPv4Address iPv4Address=IPv4Address.of(ipAddress.toOctets());
+        Set<HCPHost> hcpHosts=new HashSet<>();
+        for (Map<HostId,HCPHost> hosts:hostMap.values()){
+            for (HCPHost hcpHost:hosts.values()){
+                if (hcpHost.getiPv4Address().equals(iPv4Address)){
+                    hcpHosts.add(hcpHost);
+                }
+            }
+        }
+        return hcpHosts;
 
+    }
+
+    @Override
+    public DomainId getHostLocation(HostId hostId) {
+        for (DomainId domainId:hostMap.keySet()){
+            Map<HostId,HCPHost> map=hostMap.get(domainId);
+            if (map.get(hostId)!=null){
+                return domainId;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public long getVportLoadCapability(ConnectPoint connectPoint) {
+        if (!vportLoadCapability.containsKey(connectPoint))
+            return -1;
+        return vportLoadCapability.get(connectPoint);
+    }
+
+    @Override
+    public long getVportMaxCapability(ConnectPoint connectPoint) {
+        if (!vportMaxCapability.containsKey(connectPoint))
+            return -1;
+        return vportMaxCapability.get(connectPoint);
+    }
+
+    @Override
+    public long getVportRestCapability(ConnectPoint connectPoint) {
+        long load=vportLoadCapability.get(connectPoint);
+        long max=vportMaxCapability.get(connectPoint);
+        if (load!=-1&&max!=-1)
+            return max-load;
+        return -1;
+    }
+
+    
+    synchronized private void UpdateTopology(){
+        GraphDescription graphDescription=new DefaultGraphDescription(System.nanoTime(),System.currentTimeMillis()
+        ,superController.getDevices(),getInterDomainLink());
+        DefaultTopology defaultTopology=new DefaultTopology(ProviderId.NONE,graphDescription);
+        SuperTopology=defaultTopology;
+
+
+    }
     private void removeVport(DomainId domainId, HCPVportDescribtion hcpVportDescribtion) {
         PortNumber vportNumber = PortNumber.portNumber(hcpVportDescribtion.getPortNo().getPortNumber());
         DeviceId deviceId = getDeviceId(domainId);
@@ -149,6 +215,9 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
         }
         for (Link link : removeLink) {
             InterDomainLink.remove(link);
+        }
+        if (!removeLink.isEmpty()){
+            UpdateTopology();
         }
     }
 
@@ -188,7 +257,7 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
             }
         }
         Set<HCPHost> hosts=getHostByDomainId(domainId);
-        log.info("===================Host======={}=======",hosts.size());
+//        log.info("===================Host======={}=======",hosts.size());
 
     }
 
@@ -253,13 +322,14 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
                 .src(srcConnection)
                 .dst(dstConnection)
                 .type(Link.Type.DIRECT)
+                .state(Link.State.ACTIVE)
                 .providerId(interDomainLinkProviderId)
                 .build();
         if (InterDomainLink.contains(link)) {
             return;
         }
         InterDomainLink.add(link);
-
+        UpdateTopology();
 
     }
 

@@ -13,4 +13,9 @@ public class HexTest {
     public  void main() {
         System.out.println (String.format("%06x",2222));
     }
+    @Test
+    public void longTest(){
+        long cap=-1;
+        System.out.println(cap);
+    }
 }

@@ -8,6 +8,7 @@ import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Service;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
+import org.onlab.packet.ChassisId;
 import org.onlab.packet.DeserializationException;
 import org.onlab.packet.Ethernet;
 import org.onosproject.api.HCPDomain;
@@ -20,13 +21,14 @@ import org.onosproject.hcp.protocol.HCPFactory;
 import org.onosproject.hcp.protocol.HCPMessage;
 import org.onosproject.hcp.protocol.HCPVersion;
 import org.onosproject.hcp.types.DomainId;
+import org.onosproject.net.DefaultDevice;
+import org.onosproject.net.Device;
+import org.onosproject.net.DeviceId;
+import org.onosproject.net.provider.ProviderId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
@@ -39,8 +41,10 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class HCPSuperControllerImpl implements HCPSuperController {
 
     private static final Logger log= LoggerFactory.getLogger(HCPSuperControllerImpl.class);
-
+    //保存DomainId和每个Domain的实列
     private Map<DomainId,HCPDomain> domainMap;
+    //保存DeviceId的Device
+    private Map<DeviceId,Device> deviceMap;
 
     private HCPSuperConnector connector=new HCPSuperConnector(this);
     private Set<HCPDomainMessageListener> hcpDomainMessageListeners=new CopyOnWriteArraySet<>();
@@ -58,6 +62,7 @@ public class HCPSuperControllerImpl implements HCPSuperController {
         this.setHCPSuperPort(HCPSuperPort);
         hcpFactory=HCPFactories.getFactory(hcpVersion);
         domainMap=new HashMap<>();
+        deviceMap=new HashMap<>();
         connector.start();
         log.info("====================HCPSuperController Started=================");
     }
@@ -66,6 +71,7 @@ public class HCPSuperControllerImpl implements HCPSuperController {
         log.info("Domain controller size:{} Domain Controller Channel {}",domainMap.size(),domainMap.get(DomainId.of(1111)).channleId());
         connector.stop();
         domainMap.clear();
+        deviceMap.clear();
         log.info("========================HCPSuperController stopped================");
     }
 
@@ -123,7 +129,7 @@ public class HCPSuperControllerImpl implements HCPSuperController {
     @Override
     public void sendHCPMessge(DomainId domainId, HCPMessage message) {
         HCPDomain domain=getHCPDomain(domainId);
-        if (null!=domain&&domain.isConnected()){
+        if (null!=domain && domain.isConnected()){
             domain.sendMsg(message);
         }
     }
@@ -131,6 +137,10 @@ public class HCPSuperControllerImpl implements HCPSuperController {
     @Override
     public void addDomain(DomainId domainId, HCPDomain domain) {
         domainMap.put(domainId,domain);
+        DeviceId deviceId=domain.getDeviceId();
+        Device device=new DefaultDevice(ProviderId.NONE,deviceId,Device.Type.CONTROLLER
+                            ,"USTC","1.0","Domain Controller","1",new ChassisId(domain.getDomainId().getLong()));
+        deviceMap.put(deviceId,device);
         for (HCPDomainListener listener:hcpDomainListeners){
             listener.domainConnected(domain);
         }
@@ -140,6 +150,7 @@ public class HCPSuperControllerImpl implements HCPSuperController {
     public void removeDomain(DomainId domainId) {
         HCPDomain hcpDomain=getHCPDomain(domainId);
         if (null!=hcpDomain){
+            deviceMap.remove(hcpDomain.getDeviceId());
             domainMap.remove(domainId);
             for (HCPDomainListener listener: hcpDomainListeners){
                 listener.domainDisConnected(hcpDomain);
@@ -199,5 +210,15 @@ public class HCPSuperControllerImpl implements HCPSuperController {
             return null;
         }
         return eth;
+    }
+
+    @Override
+    public Set<Device> getDevices() {
+        return new HashSet<>(deviceMap.values());
+    }
+
+    @Override
+    public Device getDevice(DeviceId deviceId) {
+        return deviceMap.get(deviceId);
     }
 }
