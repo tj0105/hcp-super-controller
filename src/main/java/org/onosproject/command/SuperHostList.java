@@ -9,6 +9,8 @@ import org.onosproject.cli.AbstractShellCommand;
 import org.onosproject.hcp.types.DomainId;
 import org.onosproject.hcp.types.HCPHost;
 
+import java.util.Set;
+
 /**
  * @Author ldy
  * @Date: 20-3-1 下午12:16
@@ -31,8 +33,11 @@ public class SuperHostList extends AbstractShellCommand {
         controller= AbstractShellCommand.get(HCPSuperController.class);
         if (domainId==null){
             for (HCPDomain hcpDomain:controller.getDomains()){
-                for (HCPHost hcpHost:topoServices.getHostByDomainId(hcpDomain.getDomainId())){
-                    printHost(hcpDomain.getDomainId(),hcpHost);
+                Set<HCPHost> hcpHosts=topoServices.getHostByDomainId(hcpDomain.getDomainId());
+                if (hcpHosts.size()>0){
+                    for (HCPHost hcpHost:hcpHosts){
+                        printHost(hcpDomain.getDomainId(),hcpHost);
+                    }
                 }
             }
         }else {

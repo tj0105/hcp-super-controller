@@ -34,6 +34,9 @@
         <command>
             <action class="org.onosproject.command.SuperIntraDomainLink"/>
         </command>
+        <command>
+            <action class="org.onosproject.command.SuperTopologyCommand"/>
+        </command>
     </command-bundle>
 
 </blueprint>

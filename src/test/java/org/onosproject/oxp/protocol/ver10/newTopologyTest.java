@@ -22,7 +22,7 @@ public class newTopologyTest {
     protected TopologyService topologyService;
 
     public static final ClusterId C0 = ClusterId.clusterId(0);
-    public static final ClusterId C1 = ClusterId.clusterId(1);
+//    public static final ClusterId C1 = ClusterId.clusterId(1);
     @Test
     public void newTopologyTest(){
         init();
@@ -30,20 +30,21 @@ public class newTopologyTest {
                             System.currentTimeMillis(),deviceSet,linkSet);
         DefaultTopology defaultTopology=new DefaultTopology(ProviderId.NONE,description);
         Set<List<TopologyEdge>> result=new HashSet<>();
-        dfsFindAllRoutes(new DefaultTopologyVertex(deviceIdSet.get(0)),
-                new DefaultTopologyVertex(deviceIdSet.get(3))
-                ,new ArrayList<>(),new ArrayList<>(),defaultTopology.getGraph(),result);
-        result.forEach(linkSet->{
-            System.out.println(linkSet.toString());
-        });
-        System.out.println("==============================================");
-        BFSFindAllPath(new DefaultTopologyVertex(deviceIdSet.get(0)),
-                        new DefaultTopologyVertex(deviceIdSet.get(3))
-                        ,defaultTopology.getGraph());
-        System.out.println("==============================================");
-        BFSFindAllPath1(new DefaultTopologyVertex(deviceIdSet.get(0)),
-                new DefaultTopologyVertex(deviceIdSet.get(3))
-                ,defaultTopology.getGraph());
+
+//        dfsFindAllRoutes(new DefaultTopologyVertex(deviceIdSet.get(0)),
+//                new DefaultTopologyVertex(deviceIdSet.get(3))
+//                ,new ArrayList<>(),new ArrayList<>(),defaultTopology.getGraph(),result);
+//        result.forEach(linkSet->{
+//            System.out.println(linkSet.toString());
+//        });
+//        System.out.println("==============================================");
+//        BFSFindAllPath(new DefaultTopologyVertex(deviceIdSet.get(0)),
+//                        new DefaultTopologyVertex(deviceIdSet.get(3))
+//                        ,defaultTopology.getGraph());
+//        System.out.println("==============================================");
+//        BFSFindAllPath1(new DefaultTopologyVertex(deviceIdSet.get(0)),
+//                new DefaultTopologyVertex(deviceIdSet.get(3))
+//                ,defaultTopology.getGraph());
         //
 //   System.out.println(defaultTopology.getGraph().getVertexes().toString());
 //        Iterator<TopologyVertex> iterator=defaultTopology.getGraph().getVertexes().iterator();
@@ -75,6 +76,21 @@ public class newTopologyTest {
 //        System.out.println(graph.toString());
 //        Set<TopologyEdge> topologyVertices=defaultTopology.getGraph().getEdgesFrom(new DefaultTopologyVertex(deviceIdSet.get(0)));
 //        System.out.println(topologyVertices.toString());
+
+        for (TopologyVertex topologyVertex:defaultTopology.getGraph().getVertexes()){
+            for (TopologyEdge topologyEdge:defaultTopology.getGraph().getEdgesTo(topologyVertex)){
+                System.out.println(topologyEdge.link().src());
+            }
+        }
+//        System.out.println(defaultTopology.getGraph());
+        defaultTopology.getGraph().getVertexes().forEach(topologyVertex -> {
+            System.out.println(topologyVertex.deviceId());
+        });
+        for (Link Link:defaultTopology.getClusterLinks(defaultTopology.getCluster(ClusterId.clusterId(0)))){
+            System.out.println(Link.toString());
+        }
+
+
     }
 
     public void init(){

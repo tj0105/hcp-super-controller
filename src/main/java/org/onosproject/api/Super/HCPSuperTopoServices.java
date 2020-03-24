@@ -6,6 +6,8 @@ import org.onosproject.hcp.types.DomainId;
 import org.onosproject.hcp.types.HCPHost;
 import org.onosproject.hcp.types.HCPInternalLink;
 import org.onosproject.net.*;
+import org.onosproject.net.topology.TopologyEdge;
+import org.onosproject.net.topology.TopologyVertex;
 
 import java.util.List;
 import java.util.Set;
@@ -34,4 +36,8 @@ public interface HCPSuperTopoServices {
     long getVportMaxCapability(ConnectPoint connectPoint);
 
     long getVportRestCapability(ConnectPoint connectPoint);
+
+    Set<TopologyVertex> getTopologyVertx();
+
+    Set<TopologyEdge> getTopologyEdge(TopologyVertex topologyVertex);
 }

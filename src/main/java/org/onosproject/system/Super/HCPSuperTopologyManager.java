@@ -186,7 +186,18 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
             return max-load;
         return -1;
     }
+    @Override
+    public  Set<TopologyVertex> getTopologyVertx(){
+        if (SuperTopology.deviceCount()!=0){
+            return SuperTopology.getGraph().getVertexes();
+        }
+        return null;
+    }
 
+    @Override
+    public  Set<TopologyEdge> getTopologyEdge(TopologyVertex topologyVertex){
+        return SuperTopology.getGraph().getEdgesFrom(topologyVertex);
+    }
     
     synchronized private void UpdateTopology(){
         GraphDescription graphDescription=new DefaultGraphDescription(System.nanoTime(),System.currentTimeMillis()
@@ -199,11 +210,13 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
     private void removeVport(DomainId domainId, HCPVportDescribtion hcpVportDescribtion) {
         PortNumber vportNumber = PortNumber.portNumber(hcpVportDescribtion.getPortNo().getPortNumber());
         DeviceId deviceId = getDeviceId(domainId);
+        ConnectPoint connectPoint=new ConnectPoint(deviceId,vportNumber);
         Set<PortNumber> vportSet = vportMap.get(domainId);
         if (vportSet != null) {
             vportSet.remove(vportNumber);
         }
-        vportDescribtionMap.remove(new ConnectPoint(deviceId, vportNumber));
+        vportDescribtionMap.remove(connectPoint);
+        vportMaxCapability.remove(connectPoint);
         Set<Link> removeLink = new HashSet<>();
         for (Link link : InterDomainLink) {
             if (link.src().deviceId().equals(deviceId) && link.src().port().equals(vportNumber)) {
@@ -409,6 +422,7 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
             IntraDomainLink.remove(domain.getDomainId());
             vportMap.remove(domain.getDomainId());
             hostMap.remove(domain.getDomainId());
+            UpdateTopology();
 
         }
     }
