@@ -10,6 +10,7 @@ import org.onosproject.net.DeviceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.management.BadBinaryOpValueExpException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -32,15 +33,18 @@ public class HCPDomain10 implements HCPDomain{
     private HCPSbpVersion sbpVersion;
     private DomainId domainId;
     private DeviceId deviceId;
-    private HCPSuper hcpSuper;
     private HCPVersion hcpVersion;
     private HCPSuperController superController;
     private int hcpdomainport=0;
     private String hcpdomainIp=null;
-    private String ChannelId;
     private Channel channel;
-
+    private String ChannelId;
     private boolean connected;
+
+    private boolean BandwidthFlag=false;
+    private boolean DelayFlag=false;
+    private boolean HopFlag=false;
+    private boolean AdvanceFlag=false;
 
     public HCPDomain10(HCPSuperController superController){
         this.superController=superController;
@@ -112,6 +116,22 @@ public class HCPDomain10 implements HCPDomain{
     @Override
     public void setFlags(Set<HCPConfigFlags> flags) {
         this.flags=flags;
+        for (HCPConfigFlags configFlags:flags){
+            switch (configFlags){
+                case MODE_ADVANCED:
+                    AdvanceFlag=true;
+                    break;
+                case CAPABILITIES_BW:
+                    BandwidthFlag=true;
+                    break;
+                case CAPABILITIES_DELAY:
+                    DelayFlag=true;
+                    break;
+                case CAPABILITIES_HOP:
+                    HopFlag=true;
+                    break;
+            }
+        }
     }
 
     @Override
@@ -202,5 +222,25 @@ public class HCPDomain10 implements HCPDomain{
     @Override
     public void setHCPVersion(HCPVersion hcpVersion) {
         this.hcpVersion=hcpVersion;
+    }
+
+    @Override
+    public boolean isBandWidthFlag() {
+        return BandwidthFlag;
+    }
+
+    @Override
+    public boolean isDelayFlag() {
+        return DelayFlag;
+    }
+
+    @Override
+    public boolean isHopFlag() {
+        return HopFlag;
+    }
+
+    @Override
+    public boolean isAdvanceFlag() {
+        return AdvanceFlag;
     }
 }

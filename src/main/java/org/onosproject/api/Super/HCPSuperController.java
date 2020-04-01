@@ -4,6 +4,7 @@ import org.onlab.packet.Ethernet;
 import org.onosproject.api.HCPDomain;
 import org.onosproject.api.HCPDomainMessageListener;
 import org.onosproject.api.domain.HCPDomainListener;
+import org.onosproject.hcp.protocol.HCPConfigFlags;
 import org.onosproject.hcp.protocol.HCPMessage;
 import org.onosproject.hcp.protocol.HCPVersion;
 import org.onosproject.hcp.types.DomainId;
@@ -52,4 +53,7 @@ public interface HCPSuperController {
 
     Set<Device> getDevices();
     Device getDevice(DeviceId deviceId);
+
+    boolean isLoadBlance();
+    HCPConfigFlags getPathComputerParam();
 }

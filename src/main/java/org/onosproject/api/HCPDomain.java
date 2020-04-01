@@ -63,4 +63,9 @@ public interface HCPDomain {
 
     HCPVersion getHCPVersion();
     void setHCPVersion(HCPVersion hcpVersion);
+
+    boolean isBandWidthFlag();
+    boolean isDelayFlag();
+    boolean isHopFlag();
+    boolean isAdvanceFlag();
 }

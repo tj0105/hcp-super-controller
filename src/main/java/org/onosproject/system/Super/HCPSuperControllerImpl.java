@@ -16,10 +16,7 @@ import org.onosproject.api.HCPDomainMessageListener;
 import org.onosproject.api.HCPSuper;
 import org.onosproject.api.Super.HCPSuperController;
 import org.onosproject.api.domain.HCPDomainListener;
-import org.onosproject.hcp.protocol.HCPFactories;
-import org.onosproject.hcp.protocol.HCPFactory;
-import org.onosproject.hcp.protocol.HCPMessage;
-import org.onosproject.hcp.protocol.HCPVersion;
+import org.onosproject.hcp.protocol.*;
 import org.onosproject.hcp.types.DomainId;
 import org.onosproject.net.DefaultDevice;
 import org.onosproject.net.Device;
@@ -46,7 +43,11 @@ public class HCPSuperControllerImpl implements HCPSuperController {
     //保存DeviceId的Device
     private Map<DeviceId,Device> deviceMap;
 
+    //保存每個域的Configflag
+    private Map<DomainId,Integer> domainModeFlag;
+    private Map<DomainId,Boolean> loadBlanceFlag;
     private HCPSuperConnector connector=new HCPSuperConnector(this);
+    private HCPDomainListener domainListener=new InternalHCPDomainListener();
     private Set<HCPDomainMessageListener> hcpDomainMessageListeners=new CopyOnWriteArraySet<>();
     private Set<HCPDomainListener> hcpDomainListeners=new CopyOnWriteArraySet<>();
 
@@ -54,6 +55,9 @@ public class HCPSuperControllerImpl implements HCPSuperController {
     protected int HCPSuperPort=8899;
     private HCPVersion hcpVersion;
     private HCPFactory hcpFactory;
+
+    private HCPConfigFlags pathComputerParam=HCPConfigFlags.CAPABILITIES_BW;
+    private Boolean isLoadBlance=true;
 
     @Activate
     public void activate(){
@@ -63,6 +67,9 @@ public class HCPSuperControllerImpl implements HCPSuperController {
         hcpFactory=HCPFactories.getFactory(hcpVersion);
         domainMap=new HashMap<>();
         deviceMap=new HashMap<>();
+        domainModeFlag=new HashMap<>();
+        loadBlanceFlag=new HashMap<>();
+        this.addHCPDomainListener(domainListener);
         connector.start();
         log.info("====================HCPSuperController Started=================");
     }
@@ -72,6 +79,7 @@ public class HCPSuperControllerImpl implements HCPSuperController {
         connector.stop();
         domainMap.clear();
         deviceMap.clear();
+        this.removeHCPDomainListener(domainListener);
         log.info("========================HCPSuperController stopped================");
     }
 
@@ -220,5 +228,61 @@ public class HCPSuperControllerImpl implements HCPSuperController {
     @Override
     public Device getDevice(DeviceId deviceId) {
         return deviceMap.get(deviceId);
+    }
+
+    @Override
+    public boolean isLoadBlance() {
+        return isLoadBlance;
+    }
+
+    @Override
+    public HCPConfigFlags getPathComputerParam() {
+        return pathComputerParam;
+    }
+
+    private class InternalHCPDomainListener implements HCPDomainListener{
+
+        @Override
+        public void domainConnected(HCPDomain domain) {
+                DomainId domainId=domain.getDomainId();
+                int flag=0;
+                if (domain.isAdvanceFlag()){
+                    loadBlanceFlag.put(domainId,true);
+                }else{
+                    isLoadBlance=false;
+                    loadBlanceFlag.put(domainId,false);
+                }
+                if (domain.isBandWidthFlag()){
+                    flag|=1<<0;
+                }
+                else if (domain.isDelayFlag()){
+                    flag|=1<<1;
+                }
+                else if (domain.isHopFlag()){
+                    flag|=1<<2;
+                }
+                domainModeFlag.put(domainId,flag);
+                if (getDomains().size()!=1){
+                    return ;
+                }
+                switch (flag){
+                    case 1:
+                        pathComputerParam=HCPConfigFlags.CAPABILITIES_BW;
+                        break;
+                    case 2:
+                        pathComputerParam=HCPConfigFlags.CAPABILITIES_DELAY;
+                        break;
+                    case 4:
+                        pathComputerParam=HCPConfigFlags.CAPABILITIES_HOP;
+                        break;
+                }
+
+        }
+
+        @Override
+        public void domainDisConnected(HCPDomain domain) {
+                domainModeFlag.remove(domain.getDomainId());
+                loadBlanceFlag.remove(domain.getDomainId());
+        }
     }
 }

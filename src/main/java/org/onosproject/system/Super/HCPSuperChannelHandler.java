@@ -292,7 +292,6 @@ public class HCPSuperChannelHandler extends IdleStateAwareChannelHandler {
     public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
         channel=e.getChannel();
         log.info("New Domain Controller Connection from {}",channel.getRemoteAddress());
-
         setState(ChannelState.WAIT_HELLO);
     }
 

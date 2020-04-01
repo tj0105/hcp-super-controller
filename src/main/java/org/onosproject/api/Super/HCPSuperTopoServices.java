@@ -6,8 +6,7 @@ import org.onosproject.hcp.types.DomainId;
 import org.onosproject.hcp.types.HCPHost;
 import org.onosproject.hcp.types.HCPInternalLink;
 import org.onosproject.net.*;
-import org.onosproject.net.topology.TopologyEdge;
-import org.onosproject.net.topology.TopologyVertex;
+import org.onosproject.net.topology.*;
 
 import java.util.List;
 import java.util.Set;
@@ -37,7 +36,14 @@ public interface HCPSuperTopoServices {
 
     long getVportRestCapability(ConnectPoint connectPoint);
 
+    long getInterLinkDelayCapability(Link link);
+    long getInterLinkRestBandwidthCapability(Link link);
+
     Set<TopologyVertex> getTopologyVertx();
 
     Set<TopologyEdge> getTopologyEdge(TopologyVertex topologyVertex);
+
+    Set<Path> getLoadBlancePath(ElementId src, ElementId dst, Topology topology);
+    Set<Path> getLoadBlancePath(ElementId src, ElementId dst, Topology topology, LinkWeigher weigher);
+    Set<Path> getLoadBlancePath(ElementId src, ElementId dst);
 }

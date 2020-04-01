@@ -58,5 +58,5 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase name="HCPLLDPTest" classname="org.onosproject.oxp.protocol.ver10.HCPLLDPTest" time="0"/>
+  <testcase name="HCPLLDPTest" classname="org.onosproject.oxp.protocol.ver10.HCPLLDPTest" time="0.002"/>
 </testsuite>

@@ -4,9 +4,13 @@ import com.google.common.collect.ImmutableList;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.ReferenceCardinality;
 import org.junit.Test;
+import org.onlab.graph.DefaultEdgeWeigher;
+import org.onlab.graph.ScalarWeight;
+import org.onlab.graph.Weight;
 import org.onlab.packet.ChassisId;
 import org.onosproject.common.DefaultTopology;
 import org.onosproject.common.DefaultTopologyGraph;
+import org.onosproject.hcp.types.DomainId;
 import org.onosproject.net.*;
 import org.onosproject.net.provider.ProviderId;
 import org.onosproject.net.topology.*;
@@ -22,7 +26,11 @@ public class newTopologyTest {
     protected TopologyService topologyService;
 
     public static final ClusterId C0 = ClusterId.clusterId(0);
+    public final  LinkWeigher WEIGHT=new TestWeight();
 //    public static final ClusterId C1 = ClusterId.clusterId(1);
+    private DomainId domainId=DomainId.of("1");
+    private LinkWeigher linkWeigherTool=new TestWeight();
+    private ProviderId RouteproviderId=new ProviderId("USTC","HCP");
     @Test
     public void newTopologyTest(){
         init();
@@ -30,21 +38,31 @@ public class newTopologyTest {
                             System.currentTimeMillis(),deviceSet,linkSet);
         DefaultTopology defaultTopology=new DefaultTopology(ProviderId.NONE,description);
         Set<List<TopologyEdge>> result=new HashSet<>();
-
+//
+//        double startTime=System.currentTimeMillis();
 //        dfsFindAllRoutes(new DefaultTopologyVertex(deviceIdSet.get(0)),
 //                new DefaultTopologyVertex(deviceIdSet.get(3))
 //                ,new ArrayList<>(),new ArrayList<>(),defaultTopology.getGraph(),result);
 //        result.forEach(linkSet->{
 //            System.out.println(linkSet.toString());
 //        });
+//        System.out.println(System.currentTimeMillis()-startTime);
 //        System.out.println("==============================================");
-//        BFSFindAllPath(new DefaultTopologyVertex(deviceIdSet.get(0)),
-//                        new DefaultTopologyVertex(deviceIdSet.get(3))
-//                        ,defaultTopology.getGraph());
-//        System.out.println("==============================================");
+////        BFSFindAllPath(new DefaultTopologyVertex(deviceIdSet.get(0)),
+////                        new DefaultTopologyVertex(deviceIdSet.get(3))
+////                        ,defaultTopology.getGraph());
+////        System.out.println("==============================================");
+//        double startTime1=System.currentTimeMillis();
 //        BFSFindAllPath1(new DefaultTopologyVertex(deviceIdSet.get(0)),
 //                new DefaultTopologyVertex(deviceIdSet.get(3))
 //                ,defaultTopology.getGraph());
+//        System.out.println(System.currentTimeMillis()-startTime1);
+//        Set<TopologyVertex> topologyVertices=defaultTopology.getGraph().getVertexes();
+//        TopologyEdge topologyEdge=(TopologyEdge) defaultTopology.getGraph()
+//                    .getEdgesFrom((TopologyVertex) topologyVertices.toArray()[0]).toArray()[0];
+//        ScalarWeight weight=(ScalarWeight)linkWeigherTool.weight(topologyEdge);
+//        double ss=weight.value();
+//        System.out.println(ss+10);
         //
 //   System.out.println(defaultTopology.getGraph().getVertexes().toString());
 //        Iterator<TopologyVertex> iterator=defaultTopology.getGraph().getVertexes().iterator();
@@ -77,20 +95,52 @@ public class newTopologyTest {
 //        Set<TopologyEdge> topologyVertices=defaultTopology.getGraph().getEdgesFrom(new DefaultTopologyVertex(deviceIdSet.get(0)));
 //        System.out.println(topologyVertices.toString());
 
-        for (TopologyVertex topologyVertex:defaultTopology.getGraph().getVertexes()){
-            for (TopologyEdge topologyEdge:defaultTopology.getGraph().getEdgesTo(topologyVertex)){
-                System.out.println(topologyEdge.link().src());
-            }
-        }
-//        System.out.println(defaultTopology.getGraph());
-        defaultTopology.getGraph().getVertexes().forEach(topologyVertex -> {
-            System.out.println(topologyVertex.deviceId());
+//        for (TopologyVertex topologyVertex:defaultTopology.getGraph().getVertexes()){
+//            for (TopologyEdge topologyEdge:defaultTopology.getGraph().getEdgesTo(topologyVertex)){
+//                System.out.println(topologyEdge);
+//            }
+//        }
+////        System.out.println(defaultTopology.getGraph());
+//        defaultTopology.getGraph().getVertexes().forEach(topologyVertex -> {
+//            System.out.println(topologyVertex.deviceId());
+//        });
+//        for (Link Link:defaultTopology.getClusterLinks(defaultTopology.getCluster(ClusterId.clusterId(0)))){
+//            System.out.println(Link.toString());
+//        }
+
+        Set<Path> paths;
+        paths=defaultTopology.getPaths(deviceIdSet.get(0),deviceIdSet.get(2));
+        System.out.println(paths.toString());
+        System.out.println(((Path)paths.toArray()[0]).links().size());
+//        System.out.println(paths.count());
+        paths.forEach(path -> {
+            path.links().forEach(link -> {
+                System.out.println(link.toString());
+            });
+            System.out.println("===========================================");
+//            System.out.println(path.toString());
         });
-        for (Link Link:defaultTopology.getClusterLinks(defaultTopology.getCluster(ClusterId.clusterId(0)))){
-            System.out.println(Link.toString());
+
+//        System.out.println(new ScalarWeight(0.0D).toString());
+//        Set<Path> paths=new HashSet<>();
+//        paths=defaultTopology.getPaths(deviceIdSet.get(0),deviceIdSet.get(3),WEIGHT,-1);
+//        System.out.println(paths.size());
+//        paths.forEach(path -> {
+////            path.links().forEach(link -> {
+////                System.out.println(link.toString());
+////            });
+////            System.out.println("===========================================");
+//            System.out.println(path.toString());
+//        });
+
+
+    }
+     class TestWeight extends DefaultEdgeWeigher<TopologyVertex,TopologyEdge>
+                                implements LinkWeigher{
+        @Override
+        public Weight weight(TopologyEdge edge) {
+            return new ScalarWeight(6);
         }
-
-
     }
 
     public void init(){
@@ -112,7 +162,7 @@ public class newTopologyTest {
     }
 
     public void DeviceIdSet(){
-        for (int i = 1; i <=7; i++) {
+        for (int i = 1; i <=6; i++) {
             DeviceId deviceId=DeviceId.deviceId("hcp:"+String.format("%016x",i));
             deviceIdSet.add(deviceId);
         }
@@ -246,8 +296,85 @@ public class newTopologyTest {
             System.out.println(ll.toString());
         });
 
+        System.out.println("============================");
+        Set<Path> pathSet=CalculatePathCost(result);
+        Path path1=selectPath(pathSet);
+        System.out.println(path1.src());
+        System.out.println(path1.dst());
+        path1.links().forEach(link -> {
+            System.out.println(link);
+        });
+        System.out.println(path1.toString());
+
     }
 
+    /***
+     * 返回得到最优的path
+     * @param paths
+     * @return
+     */
+    private  Path selectPath(Set<Path> paths){
+        if (paths.size()<1){
+            return null;
+        }
+        return getMinCostPath(new ArrayList(paths) );
+    }
+
+    private Path getMinCostPath(List<Path> pathList){
+        pathList.sort((p1,p2)->((ScalarWeight)p1.weight()).value()>((ScalarWeight)p2.weight()).value()
+                ? 1:(((ScalarWeight)p1.weight()).value()<((ScalarWeight)p2.weight()).value())? -1:0);
+        pathList.forEach(path -> {
+            System.out.println(path);
+        });
+        System.out.println("===================================");
+        return (Path)pathList.toArray()[0];
+    }
+
+    /**
+     * 获取每条路径的权重，首先，计算路径上的每一条链路的权值,其次，选择路径上所有链路的权值的最大值，作为该路径的带宽权值
+     * 因为各条链路的负载不同，根据木桶效应，具有最大负载的链路将成为整条路径的短板.
+     * @param pathSet
+     * @return
+     */
+    private Set<Path> CalculatePathCost(Set<List<TopologyEdge>> pathSet){
+        Set<Path> allResult=new HashSet<>();
+
+        pathSet.forEach(path->{
+            ScalarWeight weight=(ScalarWeight) maxPathWeight(path);
+            allResult.add(parseEdgetoLink(path,weight));
+        });
+
+        return allResult;
+    }
+
+    /**
+     *  计算路径上的每一条链路的权值,选择路径上所有链路的权值的最大值
+     * @param edgeList
+     * @return
+     */
+    private Weight maxPathWeight(List<TopologyEdge> edgeList){
+        double weight=0;
+        for (TopologyEdge edge:edgeList){
+            ScalarWeight scalarWeight=(ScalarWeight) linkWeigherTool.weight(edge);
+            double linkWeight=scalarWeight.value();
+            weight=Double.max(weight,linkWeight);
+        }
+        return new ScalarWeight(weight);
+    }
+
+    /**
+     * 将每条路径的Edge属性改成link，并添加Cost属性
+     * @param edgeList
+     * @param cost
+     * @return
+     */
+    private Path parseEdgetoLink(List<TopologyEdge> edgeList,ScalarWeight cost){
+        List<Link> links=new ArrayList<>();
+        edgeList.forEach(edge -> {
+            links.add(edge.link());
+        });
+        return new DefaultPath(RouteproviderId,links,cost);
+    }
 
     private void dfsFindAllRoutes(TopologyVertex src,
                                   TopologyVertex dst,

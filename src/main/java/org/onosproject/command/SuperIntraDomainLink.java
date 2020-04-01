@@ -27,7 +27,7 @@ import java.util.Comparator;
         description = "Sample Apache Karaf CLI command")
 public class SuperIntraDomainLink extends AbstractShellCommand {
     private static final String FMT = "src=%s srcVport=%s, dst=%s " +
-            "dstVport=%s, type=%s, state=%s, expected=%s capability=%s";
+            "dstVport=%s, type=%s, state=%s, expected=%s Bandwidthcapability=%s, Delay=%s, Hop=%s";
     private static final String COMPACT = "%s/%s-%s/%s";
 
     private HCPSuperTopoServices topoServices;
@@ -57,7 +57,9 @@ public class SuperIntraDomainLink extends AbstractShellCommand {
         print(FMT,link.src().deviceId(),link.src().port()
                 ,link.dst().deviceId(),link.dst().port(),
                 link.type(),link.state(),link.isExpected()
-                ,hcpInternalLink.getCapability());
+                ,hcpInternalLink.getBandwidthCapability(),
+                hcpInternalLink.getDelayCapability(),
+                hcpInternalLink.getHopCapability());
     }
 
 

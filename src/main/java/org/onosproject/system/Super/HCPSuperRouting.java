@@ -2,27 +2,28 @@ package org.onosproject.system.Super;
 
 
 import org.apache.felix.scr.annotations.*;
+import org.jboss.netty.handler.execution.MemoryAwareThreadPoolExecutor;
+import org.onlab.graph.ScalarWeight;
 import org.onlab.packet.*;
+import org.onlab.packet.MacAddress;
 import org.onosproject.api.HCPDomain;
 import org.onosproject.api.HCPDomainMessageListener;
 import org.onosproject.api.Super.HCPSuperController;
 import org.onosproject.api.Super.HCPSuperTopoServices;
 import org.onosproject.hcp.protocol.*;
+import org.onosproject.hcp.protocol.ver10.HCPForwardingReplyVer10;
 import org.onosproject.hcp.protocol.ver10.HCPPacketOutVer10;
-import org.onosproject.hcp.types.DomainId;
-import org.onosproject.hcp.types.HCPHost;
-import org.onosproject.hcp.types.HCPVport;
-import org.onosproject.net.DeviceId;
-import org.onosproject.net.Host;
-import org.onosproject.net.HostId;
-import org.onosproject.net.PortNumber;
+import org.onosproject.hcp.protocol.ver10.HCPResourceRequestVer10;
+import org.onosproject.hcp.types.*;
+import org.onosproject.net.*;
+import org.onosproject.net.provider.ProviderId;
+import org.onosproject.net.topology.TopologyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.crypto.Mac;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component(immediate = true)
 public class HCPSuperRouting {
@@ -37,15 +38,22 @@ public class HCPSuperRouting {
 
     private HCPDomainMessageListener domainMessageListener=new InternalDomainMessageListener();
 
+
+    public static volatile DomainId RequestdomainId=null;
+    private ConcurrentHashMap<HCPHost,Map<PortNumber,Integer>> hostVportHop;
+
+
     @Activate
     public void activate(){
         superController.addMessageListener(domainMessageListener);
+        hostVportHop=new ConcurrentHashMap<>();
         log.info("============HCPSuperRouting Started===============");
     }
 
     @Deactivate
     public void deactivate(){
         superController.removeMessageListener(domainMessageListener);
+        hostVportHop.clear();
         log.info("============HCPSuperRouting Stoped===============");
     }
 
@@ -76,11 +84,158 @@ public class HCPSuperRouting {
                 PacketOut(hostLocation,portNumber,PortNumber.portNumber(HCPVport.LOCAL.getPortNumber()),eth);
                 break;
         }
+    }
+
+    private  void sendForwardingReplyToDomain(DeviceId deviceId,IpAddress src,IpAddress dst,HCPVport inport,HCPVport outport){
+        IPv4Address srcAddress=IPv4Address.of(src.toOctets());
+        IPv4Address dstAddress=IPv4Address.of(dst.toOctets());
+        HCPDomain  domain=superController.getHCPDomain(deviceId.toString().substring("hcp:".length()));
+        HCPForwardingReply hcpForwardingReply= HCPForwardingReplyVer10.of(srcAddress,dstAddress,
+                                                                        inport,outport,Ethernet.TYPE_IPV4,(byte) 1);
+
+        Set<HCPSbpFlags> flagset= new HashSet<>();
+        flagset.add(HCPSbpFlags.DATA_EXITS);
+        HCPSbp sbp=domain.factory().buildSbp()
+                .setSbpCmpType(HCPSbpCmpType.FLOW_FORWARDING_REPLY)
+                .setFlags(flagset)
+                .setDataLength((short)hcpForwardingReply.getData().length)
+                .setXid(1)
+                .setSbpCmpData(hcpForwardingReply)
+                .build();
+        superController.sendHCPMessge(domain.getDomainId(),sbp);
+    }
+    private  void sendRequestToDstDomain(IpAddress srcAddress,IpAddress targetAddress,HCPHost dstHost){
+        IPv4Address src=IPv4Address.of(srcAddress.toOctets());
+        IPv4Address dst=IPv4Address.of(targetAddress.toOctets());
+        HostId dsthostId=HostId.hostId(MacAddress.valueOf(dstHost.getMacAddress().getLong()));
+        DomainId hostLocation=superTopoServices.getHostLocation(dsthostId);
+        HCPDomain hcpDomain=superController.getHCPDomain(hostLocation);
+        Set<HCPConfigFlags> flags=new HashSet<>();
+        flags.add(HCPConfigFlags.CAPABILITIES_HOP);
+        Set<HCPSbpFlags> flagset= new HashSet<>();
+        flagset.add(HCPSbpFlags.DATA_EXITS);
+        HCPResourceRequest hcpResourceRequest= HCPResourceRequestVer10.of(src,dst,flags);
+        HCPSbp hcpSbp=hcpDomain.factory().buildSbp()
+                .setSbpCmpType(HCPSbpCmpType.RESOURCE_REQUEST)
+                .setFlags(flagset)
+                .setDataLength((short)hcpResourceRequest.getData().length)
+                .setXid(1)
+                .setSbpCmpData(hcpResourceRequest)
+                .build();
+        log.info("=======================hostLocation============{}",hostLocation);
+        superController.sendHCPMessge(hostLocation,hcpSbp);
 
     }
-    private void processIpv4(DomainId domainId,PortNumber portNumber,Ethernet eth){
+    private  void processFlowRequest(DomainId domainId,IpAddress srcAddress,IpAddress targetAddress,List<HCPVportHop> vportHops){
+         Set<HCPHost> srchosts=superTopoServices.getHostByIp(srcAddress);
+         Set<HCPHost> dsthosts=superTopoServices.getHostByIp(targetAddress);
+         HCPHost srcHost=(HCPHost) srchosts.toArray()[0];
+         HCPHost dstHost=(HCPHost) dsthosts.toArray()[0];
+         Map<PortNumber,Integer> vportIntegerMap=hostVportHop.get(srcHost);
+         if (vportIntegerMap==null){
+             vportIntegerMap=new HashMap<>();
+         }
+         for (HCPVportHop hcpVportHop:vportHops){
+             vportIntegerMap.put(PortNumber.portNumber(hcpVportHop.getVport().getPortNumber()),hcpVportHop.getHop());
+         }
+         log.info("=========================vportHops=====================");
+         if (dsthosts.isEmpty()){
+             return ;
+         }
+
+         if (!hostVportHop.containsKey(dstHost)){
+             log.info("========================ResourceRequest===============");
+             sendRequestToDstDomain(srcAddress,targetAddress,dstHost);
+         }
+
+         DeviceId srcDeviceId=superTopoServices.getDeviceId(domainId);
+         HostId dsthostId=HostId.hostId(MacAddress.valueOf(dstHost.getMacAddress().getLong()));
+         DomainId hostLocation=superTopoServices.getHostLocation(dsthostId);
+         DeviceId dstDeviceId=superTopoServices.getDeviceId(hostLocation);
+         if (srcDeviceId.equals(dstDeviceId)){
+             return ;
+         }
+         Set<Path> paths=null;
+         Map<PortNumber,Integer> dstVportHops=hostVportHop.get(dstHost);
+         Path path=null;
+         if (superController.isLoadBlance()){
+             paths=superTopoServices.getLoadBlancePath(srcDeviceId,dstDeviceId);
+             if (dstVportHops==null){
+                  path=selectPath(paths,vportIntegerMap,null);
+             }
+                 path=selectPath(paths,vportIntegerMap,dstVportHops);
+         }
+//         List<Link> linkList=path.links();
+//         PortNumber srcport=null;
+        log.info("===============path=============={}",path.toString());
+         Link former =null;
+         for (Link link:path.links()){
+             boolean flag=false;
+             former=link;
+            if (link.src().deviceId().equals(srcDeviceId)||link.dst().deviceId().equals(dstDeviceId)){
+                if (link.src().deviceId().equals(srcDeviceId)){
+                    flag=true;
+                    sendForwardingReplyToDomain(srcDeviceId,srcAddress,
+                            targetAddress,HCPVport.OUT_PORT,HCPVport.ofShort((short)link.src().port().toLong()));
+                log.info("=======deviceId={}==HCPVport==={}=",srcDeviceId,HCPVport.ofShort((short)link.src().port().toLong()).toString());
+                }
+                if (link.dst().deviceId().equals(dstDeviceId)){
+                    sendForwardingReplyToDomain(dstDeviceId,srcAddress,targetAddress,HCPVport.IN_PORT,HCPVport.ofShort((short)link.dst().port().toLong()));
+                    log.info("=======deviceId={}==HCPVport==={}=",dstDeviceId,HCPVport.ofShort((short)link.dst().port().toLong()).toString());
+                }
+                if (flag)
+                    continue;
+            }
+            log.info("========================ssssssssssssssssssssssssss============================");
+            sendForwardingReplyToDomain(link.src().deviceId(),srcAddress,targetAddress,
+                    HCPVport.ofShort((short)former.dst().port().toLong()),HCPVport.ofShort((short)link.src().port().toLong()));
+        }
 
     }
+    private Path selectPath(Set<Path> pathSet,Map<PortNumber,Integer> srcVportHops,Map<PortNumber,Integer> dstVportHops){
+        List<Path> pathList=new ArrayList(pathSet);
+        List<Path> newPath=new ArrayList<>();
+        Link former=null;
+        for (Path path:pathList){
+            double cost=0;
+            for (Link link:path.links()){
+                boolean flag=false;
+                former=link;
+                if (link.src().equals(path.src())||link.dst().equals(path.dst())){
+                    if (link.src().equals(path.src())){
+                        flag=true;
+                        cost+=srcVportHops.get(link.src().port());
+                    }
+                    if (link.dst().equals(path.dst())){
+                        if (dstVportHops==null){
+                            cost+=2;
+                        }
+                        else{
+                            cost+=dstVportHops.get(link.dst().port());
+                        }
+                    }
+                    if (flag)
+                        continue;
+                }
+                Link link1=DefaultLink.builder()
+                        .src(former.dst())
+                        .dst(link.src())
+                        .type(Link.Type.DIRECT)
+                        .state(Link.State.ACTIVE)
+                        .providerId(HCPSuperTopologyManager.interDomainLinkProviderId)
+                        .build();
+                cost+=superTopoServices.getinternalLinkDesc(link1).getHopCapability();
+            }
+            cost+=((ScalarWeight)path.weight()).value();
+            Path path1=new DefaultPath(HCPSuperTopologyManager.RouteproviderId,path.links(),new ScalarWeight(cost));
+            newPath.add(path1);
+        }
+        newPath.sort((p1, p2) -> ((ScalarWeight) p1.weight()).value() > ((ScalarWeight) p2.weight()).value()
+                    ? 1 : (((ScalarWeight) p1.weight()).value() < ((ScalarWeight) p2.weight()).value()) ? -1 : 0);
+        return newPath.isEmpty()?null:newPath.get(0);
+    }
+
+
     private void floodArp(Ethernet ethernet){
         for (HCPDomain domain:superController.getDomains()){
             PacketOut(domain.getDomainId(),PortNumber.portNumber(HCPVport.LOCAL.getPortNumber())
@@ -117,6 +272,31 @@ public class HCPSuperRouting {
                 HCPPacketIn hcpPacketIn=(HCPPacketIn)sbp.getSbpCmpData();
                 portNumber=PortNumber.portNumber(hcpPacketIn.getInport());
                 ethernet=superController.parseEthernet(hcpPacketIn.getData());
+            }else if(sbp.getSbpCmpType()==HCPSbpCmpType.FLOW_FORWARDING_REQUEST){
+                HCPForwardingRequest hcpForwardingRequest=(HCPForwardingRequest) sbp.getSbpCmpData();
+                log.info("=============FlOWRequest=====================");
+                IpAddress srcAddrss=IpAddress.valueOf(hcpForwardingRequest.getSrcIpAddress().toString());
+                IpAddress targetAddress=IpAddress.valueOf(hcpForwardingRequest.getDstIpAddress().toString());
+                int EthetType = hcpForwardingRequest.getEthType();
+                List<HCPVportHop> vportHops=hcpForwardingRequest.getvportHopList();
+                processFlowRequest(domainId,srcAddrss,targetAddress,vportHops);
+                return ;
+            }else if (sbp.getSbpCmpType()==HCPSbpCmpType.RESOURCE_REPLY){
+                HCPResourceReply hcpResourceReply=(HCPResourceReply) sbp.getSbpCmpData();
+                log.info("===============hcpResourceReply============{}",hcpResourceReply.toString());
+//                IpAddress srcAddrss=IpAddress.valueOf(hcpResourceReply.getSrcIpAddress().toString());
+                IpAddress targetAddress=IpAddress.valueOf(hcpResourceReply.getDstIpAddress().toString());
+                Set<HCPHost> dsthosts=superTopoServices.getHostByIp(targetAddress);
+                HCPHost dstHost=(HCPHost) dsthosts.toArray()[0];
+                List<HCPVportHop> vportHops=hcpResourceReply.getvportHopList();
+                Map<PortNumber,Integer> vportHopmap=hostVportHop.get(dstHost);
+                if (vportHopmap==null){
+                    vportHopmap=new HashMap<>();
+                }for (HCPVportHop hcpVportHop:vportHops){
+                    vportHopmap.put(PortNumber.portNumber(hcpVportHop.getVport().getPortNumber()),hcpVportHop.getHop());
+                }
+//                log.info("=================vportHopMap============={}",vportHopmap.toString());
+                return ;
             }
 
             if (ethernet==null){
@@ -129,10 +309,6 @@ public class HCPSuperRouting {
                 return ;
             }
 
-            if (ethernet.getEtherType()==Ethernet.TYPE_IPV6){
-                processIpv4(domainId,portNumber,ethernet);
-                return;
-            }
 
         }
 
