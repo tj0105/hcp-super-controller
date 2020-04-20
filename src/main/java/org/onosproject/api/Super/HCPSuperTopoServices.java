@@ -6,6 +6,7 @@ import org.onosproject.hcp.types.DomainId;
 import org.onosproject.hcp.types.HCPHost;
 import org.onosproject.hcp.types.HCPInternalLink;
 import org.onosproject.net.*;
+import org.onosproject.net.provider.ProviderId;
 import org.onosproject.net.topology.*;
 
 import java.util.List;
@@ -46,4 +47,6 @@ public interface HCPSuperTopoServices {
     Set<Path> getLoadBlancePath(ElementId src, ElementId dst, Topology topology);
     Set<Path> getLoadBlancePath(ElementId src, ElementId dst, Topology topology, LinkWeigher weigher);
     Set<Path> getLoadBlancePath(ElementId src, ElementId dst);
+
+    ProviderId getinterDomainLinkProviderId();
 }

@@ -53,6 +53,7 @@ public class HCPDomain10 implements HCPDomain{
     private void sendMessageOnChanel(List<HCPMessage> messages){
         if (channel.isConnected())  {
             channel.write(messages);
+//            log.info("=================message==========={}",messages.get(0).getType());
             superController.processDownstremMessage(domainId,messages);
         }else{
             log.warn("Drop those messages because hcpdomain channel is disconnected, messages:{}",messages);

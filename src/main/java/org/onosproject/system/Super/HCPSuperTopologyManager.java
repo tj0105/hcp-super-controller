@@ -242,6 +242,11 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
         return getLoadBlancePath(src,dst,SuperTopology);
     }
 
+    @Override
+    public ProviderId getinterDomainLinkProviderId() {
+        return interDomainLinkProviderId;
+    }
+
     /**
      * 获取跳数最少的路径
      * @param pathList

@@ -52,8 +52,9 @@ public class HexTest {
     public void HashMap(){
         Map<String,Integer> integerIntegerMap=new HashMap<>();
         integerIntegerMap.put("1",2);
-        integerIntegerMap.put("2",3);
+//        integerIntegerMap.put("2",3);
         integerIntegerMap.put("1",2);
+        System.out.println(!integerIntegerMap.containsKey("1"));
         System.out.println(integerIntegerMap.toString());
         integerIntegerMap.put("1",4);
         System.out.println(integerIntegerMap.toString());

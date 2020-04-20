@@ -134,11 +134,12 @@ public class HCPSuperRouting {
          Map<PortNumber,Integer> vportIntegerMap=hostVportHop.get(srcHost);
          if (vportIntegerMap==null){
              vportIntegerMap=new HashMap<>();
+             hostVportHop.put(srcHost,vportIntegerMap);
          }
          for (HCPVportHop hcpVportHop:vportHops){
              vportIntegerMap.put(PortNumber.portNumber(hcpVportHop.getVport().getPortNumber()),hcpVportHop.getHop());
          }
-         log.info("=========================vportHops=====================");
+         log.info("===srchost{},dsthost{},vportIntergerMap{}===",srcHost.toString(),dstHost.toString(),vportIntegerMap.toString());
          if (dsthosts.isEmpty()){
              return ;
          }
@@ -160,14 +161,21 @@ public class HCPSuperRouting {
          Path path=null;
          if (superController.isLoadBlance()){
              paths=superTopoServices.getLoadBlancePath(srcDeviceId,dstDeviceId);
+//             log.info("===============paths==={}",paths.toString());
              if (dstVportHops==null){
+                 log.info("===============dstvportsHops is null===========");
                   path=selectPath(paths,vportIntegerMap,null);
+                 log.info("===========,path={}",path.toString());
+             }else{
+                 log.info("=========dstvportsHops have={}===",dstVportHops.toString());
+                  path=selectPath(paths,vportIntegerMap,dstVportHops);
+                 log.info("===========path={}",path.toString());
              }
-                 path=selectPath(paths,vportIntegerMap,dstVportHops);
+
          }
 //         List<Link> linkList=path.links();
 //         PortNumber srcport=null;
-        log.info("===============path=============={}",path.toString());
+
          Link former =null;
          for (Link link:path.links()){
              boolean flag=false;
@@ -196,13 +204,14 @@ public class HCPSuperRouting {
         List<Path> pathList=new ArrayList(pathSet);
         List<Path> newPath=new ArrayList<>();
         Link former=null;
+        log.info("===============paths11111111111==={}",pathSet.toString());
         for (Path path:pathList){
             double cost=0;
             for (Link link:path.links()){
                 boolean flag=false;
-                former=link;
                 if (link.src().equals(path.src())||link.dst().equals(path.dst())){
                     if (link.src().equals(path.src())){
+                        former=link;
                         flag=true;
                         cost+=srcVportHops.get(link.src().port());
                     }
@@ -222,16 +231,19 @@ public class HCPSuperRouting {
                         .dst(link.src())
                         .type(Link.Type.DIRECT)
                         .state(Link.State.ACTIVE)
-                        .providerId(HCPSuperTopologyManager.interDomainLinkProviderId)
+                        .providerId(ProviderId.NONE)
                         .build();
                 cost+=superTopoServices.getinternalLinkDesc(link1).getHopCapability();
+                former=link;
             }
             cost+=((ScalarWeight)path.weight()).value();
             Path path1=new DefaultPath(HCPSuperTopologyManager.RouteproviderId,path.links(),new ScalarWeight(cost));
             newPath.add(path1);
         }
+
         newPath.sort((p1, p2) -> ((ScalarWeight) p1.weight()).value() > ((ScalarWeight) p2.weight()).value()
                     ? 1 : (((ScalarWeight) p1.weight()).value() < ((ScalarWeight) p2.weight()).value()) ? -1 : 0);
+        log.info("==============newpath={}",newPath.toString());
         return newPath.isEmpty()?null:newPath.get(0);
     }
 
@@ -244,6 +256,7 @@ public class HCPSuperRouting {
     }
 
     private void PacketOut(DomainId domainId,PortNumber inPort, PortNumber outPort,Ethernet ethernet){
+
         HCPDomain domain=superController.getHCPDomain(domainId);
         byte [] frames=ethernet.serialize();
         HCPPacketOut hcpPacketOut= HCPPacketOutVer10.of((int)outPort.toLong(),frames);
@@ -256,6 +269,9 @@ public class HCPSuperRouting {
                 .setXid(1)
                 .setSbpCmpData(hcpPacketOut)
                 .build();
+//        log.info("==============domainId={}==============",domainId);
+//        log.info("======================framew==========={}",frames);
+//        log.info("==============domianId={}===========",hcpSbp.getType());
         superController.sendHCPMessge(domainId,hcpSbp);
 
     }
@@ -304,7 +320,7 @@ public class HCPSuperRouting {
             }
 
             if (ethernet.getEtherType()==Ethernet.TYPE_ARP){
-//                log.info("============ARP========{}",(ARP)ethernet.getPayload());
+                log.info("============ARP========{}",(ARP)ethernet.getPayload());
                 processArp(domainId,portNumber,ethernet);
                 return ;
             }

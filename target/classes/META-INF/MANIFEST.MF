@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1585753830667
+Bnd-LastModified: 1587389436639
 Build-Jdk: 1.8.0_241
 Built-By: ldy
 Bundle-Blueprint: OSGI-INF/blueprint/shell-config.xml
@@ -36,14 +36,14 @@ Export-Package: org.onosproject.system.Super;version="1.0.0";uses:="org.
  .types",org.onosproject.api.Super;version="1.0.0";uses:="org.jboss.nett
  y.channel,org.onlab.packet,org.onosproject.api,org.onosproject.api.doma
  in,org.onosproject.hcp.protocol,org.onosproject.hcp.types,org.onosproje
- ct.net,org.onosproject.net.topology",org.onosproject.api;version="1.0.0
- ";uses:="org.jboss.netty.channel,org.onosproject.hcp.protocol,org.onosp
- roject.hcp.types,org.onosproject.net",org.onosproject.api.domain;versio
- n="1.0.0";uses:="org.onosproject.api,org.onosproject.api.Super,org.onos
- project.hcp.protocol,org.onosproject.hcp.types,org.onosproject.net",org
- .onosproject.command;version="1.0.0";uses:="com.fasterxml.jackson.datab
- ind,org.apache.karaf.shell.commands,org.onosproject.cli,org.onosproject
- .hcp.types,org.onosproject.net"
+ ct.net,org.onosproject.net.provider,org.onosproject.net.topology",org.o
+ nosproject.api;version="1.0.0";uses:="org.jboss.netty.channel,org.onosp
+ roject.hcp.protocol,org.onosproject.hcp.types,org.onosproject.net",org.
+ onosproject.api.domain;version="1.0.0";uses:="org.onosproject.api,org.o
+ nosproject.api.Super,org.onosproject.hcp.protocol,org.onosproject.hcp.t
+ ypes,org.onosproject.net",org.onosproject.command;version="1.0.0";uses:
+ ="com.fasterxml.jackson.databind,org.apache.karaf.shell.commands,org.on
+ osproject.cli,org.onosproject.hcp.types,org.onosproject.net"
 Import-Package: com.fasterxml.jackson.databind;version="[2.8,3)",com.fas
  terxml.jackson.databind.node;version="[2.8,3)",com.google.common.base;v
  ersion="[22.0,23)",com.google.common.collect;version="[22.0,23)",com.go
