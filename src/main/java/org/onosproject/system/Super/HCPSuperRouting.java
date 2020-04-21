@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.crypto.Mac;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 @Component(immediate = true)
 public class HCPSuperRouting {
@@ -41,12 +41,15 @@ public class HCPSuperRouting {
 
     public static volatile DomainId RequestdomainId=null;
     private ConcurrentHashMap<HCPHost,Map<PortNumber,Integer>> hostVportHop;
-
-
+    private ConcurrentHashMap<String,Long> processFlowTime;
+    private static ExecutorService executorService=new ThreadPoolExecutor(10,10,
+            60, TimeUnit.SECONDS,new ArrayBlockingQueue<>(10));
+    private static final long FLOW_AGE=2000;
     @Activate
     public void activate(){
         superController.addMessageListener(domainMessageListener);
         hostVportHop=new ConcurrentHashMap<>();
+        processFlowTime=new ConcurrentHashMap<>();
         log.info("============HCPSuperRouting Started===============");
     }
 
@@ -54,6 +57,7 @@ public class HCPSuperRouting {
     public void deactivate(){
         superController.removeMessageListener(domainMessageListener);
         hostVportHop.clear();
+        processFlowTime=new ConcurrentHashMap<>();
         log.info("============HCPSuperRouting Stoped===============");
     }
 
@@ -132,6 +136,10 @@ public class HCPSuperRouting {
          HCPHost srcHost=(HCPHost) srchosts.toArray()[0];
          HCPHost dstHost=(HCPHost) dsthosts.toArray()[0];
          Map<PortNumber,Integer> vportIntegerMap=hostVportHop.get(srcHost);
+        if (!hostVportHop.containsKey(dstHost)){
+            log.info("========================ResourceRequest===============");
+            sendRequestToDstDomain(srcAddress,targetAddress,dstHost);
+        }
          if (vportIntegerMap==null){
              vportIntegerMap=new HashMap<>();
              hostVportHop.put(srcHost,vportIntegerMap);
@@ -142,11 +150,6 @@ public class HCPSuperRouting {
          log.info("===srchost{},dsthost{},vportIntergerMap{}===",srcHost.toString(),dstHost.toString(),vportIntegerMap.toString());
          if (dsthosts.isEmpty()){
              return ;
-         }
-
-         if (!hostVportHop.containsKey(dstHost)){
-             log.info("========================ResourceRequest===============");
-             sendRequestToDstDomain(srcAddress,targetAddress,dstHost);
          }
 
          DeviceId srcDeviceId=superTopoServices.getDeviceId(domainId);
@@ -163,8 +166,16 @@ public class HCPSuperRouting {
              paths=superTopoServices.getLoadBlancePath(srcDeviceId,dstDeviceId);
 //             log.info("===============paths==={}",paths.toString());
              if (dstVportHops==null){
-                 log.info("===============dstvportsHops is null===========");
-                  path=selectPath(paths,vportIntegerMap,null);
+                 while(dstVportHops==null){
+                     try {
+                         Thread.sleep(2);
+                         dstVportHops=hostVportHop.get(dstHost);
+                     } catch (InterruptedException e) {
+                         e.printStackTrace();
+                     }
+                 }
+                 log.info("===============dstvportsHops is null {}===========",dstVportHops);
+                  path=selectPath(paths,vportIntegerMap,dstVportHops);
                  log.info("===========,path={}",path.toString());
              }else{
                  log.info("=========dstvportsHops have={}===",dstVportHops.toString());
@@ -200,6 +211,20 @@ public class HCPSuperRouting {
         }
 
     }
+//    class pathCallable implements Callable<Path>{
+//        private Set<Path> pathset;
+//        private Map<PortNumber,Integer> srcVportHops;
+//        private HCPHost dstHost;
+//        pathCallable(Set<Path> paths,Map<PortNumber,Integer> srcVportHops,HCPHost dstHost){
+//            this.pathset=paths;
+//            this.srcVportHops=srcVportHops;
+//            this.dstHost=dstHost;
+//        }
+//        @Override
+//        public Path call() throws Exception {
+//
+//        }
+//    }
     private Path selectPath(Set<Path> pathSet,Map<PortNumber,Integer> srcVportHops,Map<PortNumber,Integer> dstVportHops){
         List<Path> pathList=new ArrayList(pathSet);
         List<Path> newPath=new ArrayList<>();
@@ -295,7 +320,31 @@ public class HCPSuperRouting {
                 IpAddress targetAddress=IpAddress.valueOf(hcpForwardingRequest.getDstIpAddress().toString());
                 int EthetType = hcpForwardingRequest.getEthType();
                 List<HCPVportHop> vportHops=hcpForwardingRequest.getvportHopList();
-                processFlowRequest(domainId,srcAddrss,targetAddress,vportHops);
+                String srcip=srcAddrss.toString()+" "+targetAddress.toString();
+                long nowTime=System.currentTimeMillis();
+                if (!processFlowTime.containsKey(srcip)){
+                    processFlowTime.put(srcip,nowTime);
+                    new Thread(){
+                        @Override
+                        public void run(){
+                            processFlowRequest(domainId,srcAddrss,targetAddress,vportHops);
+                        }
+
+                    }.start();
+
+                }else{
+                    long beforeTime=processFlowTime.get(srcip);
+                    if (nowTime-beforeTime>FLOW_AGE){
+                        processFlowTime.put(srcip,nowTime);
+                        new Thread(){
+                            @Override
+                            public void run(){
+                                processFlowRequest(domainId,srcAddrss,targetAddress,vportHops);
+                            }
+
+                        }.start();
+                    }
+                }
                 return ;
             }else if (sbp.getSbpCmpType()==HCPSbpCmpType.RESOURCE_REPLY){
                 HCPResourceReply hcpResourceReply=(HCPResourceReply) sbp.getSbpCmpData();
@@ -308,6 +357,7 @@ public class HCPSuperRouting {
                 Map<PortNumber,Integer> vportHopmap=hostVportHop.get(dstHost);
                 if (vportHopmap==null){
                     vportHopmap=new HashMap<>();
+                    hostVportHop.put(dstHost,vportHopmap);
                 }for (HCPVportHop hcpVportHop:vportHops){
                     vportHopmap.put(PortNumber.portNumber(hcpVportHop.getVport().getPortNumber()),hcpVportHop.getHop());
                 }
