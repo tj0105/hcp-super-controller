@@ -208,9 +208,9 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
     @Override
     public long getInterLinkRestBandwidthCapability(Link link) {
         Preconditions.checkNotNull(link);
-        long srcVPortDelayCapablity =getVportRestCapability(link.src());
-        long dstVportDelayCapablity =getVportRestCapability(link.dst());
-        return Long.min(srcVPortDelayCapablity,dstVportDelayCapablity);
+//        long srcVPortDelayCapablity =getVportRestCapability(link.src());
+        long dstVportRestCapablity =getVportRestCapability(link.dst());
+        return dstVportRestCapablity;
     }
 
     @Override
@@ -359,8 +359,6 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
             }
             return new ScalarWeight(weight);
         }
-
-
     }
 
     /**
@@ -435,24 +433,30 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
         @Override
         public Weight weight(TopologyEdge edge) {
             if (superController.getPathComputerParam().equals(HCPConfigFlags.CAPABILITIES_HOP)){
-                return new ScalarWeight(1);
+                long linkRest=getInterLinkRestBandwidthCapability(edge.link());
+                if (linkRest>2){
+                    return new ScalarWeight(1);
+                }
+                else{
+                    return new ScalarWeight(1000);
+                }
             }else if (superController.getPathComputerParam().equals(HCPConfigFlags.CAPABILITIES_DELAY)){
                 return new ScalarWeight(getInterLinkDelayCapability(edge.link()));
             }
             else{
                 long linkSpeed=getLinkBandWidth(edge.link());
-                long linkRest =getInterLinkDelayCapability(edge.link());
+                long linkRest =getInterLinkRestBandwidthCapability(edge.link());
                 if (linkRest<=0){
                     return new ScalarWeight(LINK_WEIGTH_FULL);
                 }
-                return new ScalarWeight( 100- linkSpeed*1.0/linkRest*100);
+                return new ScalarWeight( 10- linkRest*1.0/linkSpeed*100);
             }
         }
         public long getLinkBandWidth(Link link){
-            long srcBandWidth=getVportMaxCapability(link.src());
-            long dstBandWidth=getVportMaxCapability(link.dst());
-            if (srcBandWidth!=-1&&dstBandWidth!=-1){
-                return Long.min(srcBandWidth,dstBandWidth);
+            long BandWidth=getVportMaxCapability(link.dst());
+//            long dstBandWidth=getVportMaxCapability(link.dst());
+            if (BandWidth!=-1){
+                return BandWidth;
             }
             return -1;
         }

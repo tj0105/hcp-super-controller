@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.crypto.Mac;
+import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -159,7 +160,7 @@ public class HCPSuperRouting {
          if (srcDeviceId.equals(dstDeviceId)){
              return ;
          }
-         Set<Path> paths=null;
+         Set<Path> paths;
          Map<PortNumber,Integer> dstVportHops=hostVportHop.get(dstHost);
          Path path=null;
          if (superController.isLoadBlance()){
@@ -262,10 +263,11 @@ public class HCPSuperRouting {
                 former=link;
             }
             cost+=((ScalarWeight)path.weight()).value();
-            Path path1=new DefaultPath(HCPSuperTopologyManager.RouteproviderId,path.links(),new ScalarWeight(cost));
-            newPath.add(path1);
+            if (cost<1000){
+                Path path1=new DefaultPath(HCPSuperTopologyManager.RouteproviderId,path.links(),new ScalarWeight(cost));
+                newPath.add(path1);
+            }
         }
-
         newPath.sort((p1, p2) -> ((ScalarWeight) p1.weight()).value() > ((ScalarWeight) p2.weight()).value()
                     ? 1 : (((ScalarWeight) p1.weight()).value() < ((ScalarWeight) p2.weight()).value()) ? -1 : 0);
         log.info("==============newpath={}",newPath.toString());

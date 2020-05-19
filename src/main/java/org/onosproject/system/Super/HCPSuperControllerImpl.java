@@ -75,7 +75,7 @@ public class HCPSuperControllerImpl implements HCPSuperController {
     }
     @Deactivate
     public void deactivate(){
-        log.info("Domain controller size:{} Domain Controller Channel {}",domainMap.size(),domainMap.get(DomainId.of(1111)).channleId());
+//        log.info("Domain controller size:{} Domain Controller Channel {}",domainMap.size(),domainMap.get(DomainId.of(1111)).channleId());
         connector.stop();
         domainMap.clear();
         deviceMap.clear();

@@ -36,8 +36,8 @@ public class HexTest {
     }
     @Test
     public void longTest(){
-        long cap=-1;
-        System.out.println(cap);
+       String s="hcp:0000000000000000001a";
+        System.out.println(Integer.parseInt(s.split(":")[1],16));
     }
     @Test
     public void andTest(){

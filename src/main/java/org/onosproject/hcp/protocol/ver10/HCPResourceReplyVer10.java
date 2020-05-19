@@ -13,29 +13,23 @@ import org.onosproject.hcp.util.ChannelUtils;
 import java.util.List;
 
 public class HCPResourceReplyVer10 implements HCPResourceReply {
-    private IPv4Address srcIpAddress;
     private IPv4Address dstIpAddress;
     private List<HCPVportHop> vportlist;
 
-    HCPResourceReplyVer10(IPv4Address srcIpAddress,IPv4Address dstIpAddress,List<HCPVportHop> list){
-        this.srcIpAddress=srcIpAddress;
+    HCPResourceReplyVer10(IPv4Address dstIpAddress,List<HCPVportHop> list){
         this.dstIpAddress=dstIpAddress;
         this.vportlist=list;
     }
 
-    public static HCPResourceReplyVer10 of(IPv4Address srcIpAddress,IPv4Address dstIpAddress,List<HCPVportHop> list){
-        return new HCPResourceReplyVer10(srcIpAddress,dstIpAddress,list);
+    public static HCPResourceReplyVer10 of(IPv4Address dstIpAddress,List<HCPVportHop> list){
+        return new HCPResourceReplyVer10(dstIpAddress,list);
     }
 
     public static HCPResourceReply read(ChannelBuffer bb,int dataLength) throws HCPParseError{
         IPv4Address srcIpAddress=IPv4Address.read4Bytes(bb);
         IPv4Address dstIpAddress=IPv4Address.read4Bytes(bb);
         List<HCPVportHop> vportHops=ChannelUtils.readList(bb,dataLength,HCPVportHopVer10.READER);
-        return of(srcIpAddress,dstIpAddress,vportHops);
-    }
-    @Override
-    public IPv4Address getSrcIpAddress() {
-        return srcIpAddress;
+        return of(dstIpAddress,vportHops);
     }
 
     @Override
@@ -58,7 +52,6 @@ public class HCPResourceReplyVer10 implements HCPResourceReply {
 
     @Override
     public void writeTo(ChannelBuffer bb) {
-        srcIpAddress.writeTo(bb);
         dstIpAddress.writeTo(bb);
         ChannelUtils.writeList(bb,vportlist);
     }
@@ -78,8 +71,7 @@ public class HCPResourceReplyVer10 implements HCPResourceReply {
             if (other.vportlist!= null)
                 return false;
         }
-        if (srcIpAddress != null ? !srcIpAddress.equals(other.srcIpAddress) : other.srcIpAddress != null)
-            return false;
+
         if (dstIpAddress != null ? !dstIpAddress.equals(other.dstIpAddress) : other.dstIpAddress != null)
             return false;
         return true;
@@ -89,7 +81,6 @@ public class HCPResourceReplyVer10 implements HCPResourceReply {
     public int hashCode () {
         final int prime = 31;
         int result = 1;
-        result = result * prime + (srcIpAddress != null ? srcIpAddress.hashCode() : 0);
         result = result * prime + (dstIpAddress != null ? dstIpAddress.hashCode() : 0);
         result = result * prime+vportlist.hashCode();
         return result;
@@ -98,7 +89,6 @@ public class HCPResourceReplyVer10 implements HCPResourceReply {
     @Override
     public String toString() {
         return "HCPResourceReplyVer10{" +
-                "srcIpAddress=" + srcIpAddress.toString() +
                 ", dstIpAddress=" + dstIpAddress.toString() +
                 ", vportlist=" + vportlist.toString()+
                 '}';

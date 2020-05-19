@@ -6,7 +6,6 @@ import org.onosproject.hcp.types.IPv4Address;
 import java.util.List;
 
 public interface HCPResourceReply extends HCPSbpCmpData{
-    IPv4Address getSrcIpAddress();
     IPv4Address getDstIpAddress();
     List<HCPVportHop> getvportHopList();
 }
