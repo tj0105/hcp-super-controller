@@ -1,5 +1,6 @@
 package org.onosproject.oxp.protocol.ver10;
 
+import com.eclipsesource.json.JsonObject;
 import com.google.common.collect.ImmutableList;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.ReferenceCardinality;
@@ -38,189 +39,331 @@ public class newTopologyTest {
     private HashMap<TopologyVertex,List<TopologyEdge>> topologyVertexListHashMap=new HashMap<>();
 
     private Socket socket=null;
-    private InputStream inputStream;
-    private InputStreamReader inputStreamReader;
-    private BufferedReader bufferedReader;
-    private OutputStream outputStream;
-    private PrintWriter printWriter;
-    @Test
-    public void newTopologyTest(){
-        init();
-        GraphDescription description=new DefaultGraphDescription(System.nanoTime(),
-                            System.currentTimeMillis(),deviceSet,linkSet);
-        DefaultTopology defaultTopology=new DefaultTopology(ProviderId.NONE,description);
-        topologyVertexArrayList=new ArrayList<>(defaultTopology.getGraph().getVertexes());
-        for (TopologyVertex topologyVertex:topologyVertexArrayList){
-            List<TopologyEdge> topologyEdgeList=new ArrayList<>(defaultTopology.getGraph().getEdgesFrom(topologyVertex));
-            topologyVertexListHashMap.put(topologyVertex,topologyEdgeList);
-        }
-        try {
-            socket=new Socket("192.168.108.100",11000);
-            inputStream=socket.getInputStream();
-            inputStreamReader=new InputStreamReader(inputStream);
-            bufferedReader=new BufferedReader(inputStreamReader);
-            outputStream=socket.getOutputStream();
-            printWriter=new PrintWriter(outputStream);
-        }
-        catch (IOException e){
-            e.printStackTrace();
-        }
-        writeFile();
-        new Thread(new start_socket()).start();
-        while(true) {
-            try {
-                Thread.sleep(3000);
-                String message = "5";
-                printWriter.println(message);
-                printWriter.flush();
-                String mess = bufferedReader.readLine();
-                System.out.println(mess);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+    private static InputStream inputStream;
+    private static InputStreamReader inputStreamReader;
+    private static BufferedReader bufferedReader;
+    private static OutputStream outputStream;
+    private static PrintWriter printWriter;
 
-//        init();
-//        GraphDescription description=new DefaultGraphDescription(System.nanoTime(),
-//                            System.currentTimeMillis(),deviceSet,linkSet);
-//        DefaultTopology defaultTopology=new DefaultTopology(ProviderId.NONE,description);
-//        topologyVertexArrayList=new ArrayList<>(defaultTopology.getGraph().getVertexes());
-//        for (TopologyVertex topologyVertex:topologyVertexArrayList){
-//            List<TopologyEdge> topologyEdgeList=new ArrayList<>(defaultTopology.getGraph().getEdgesFrom(topologyVertex));
-//            topologyVertexListHashMap.put(topologyVertex,topologyEdgeList);
-//        }
-//        for (TopologyVertex topologyVertex:topologyVertexArrayList){
+    private boolean drl_train_complete=false;
+    @Test
+    public void newTopologyTest() {
+////        init();
+////        GraphDescription description=new DefaultGraphDescription(System.nanoTime(),
+////                            System.currentTimeMillis(),deviceSet,linkSet);
+////        DefaultTopology defaultTopology=new DefaultTopology(ProviderId.NONE,description);
+////        topologyVertexArrayList=new ArrayList<>(defaultTopology.getGraph().getVertexes());
+////        for (TopologyVertex topologyVertex:topologyVertexArrayList){
+////            List<TopologyEdge> topologyEdgeList=new ArrayList<>(defaultTopology.getGraph().getEdgesFrom(topologyVertex));
+////            topologyVertexListHashMap.put(topologyVertex,topologyEdgeList);
+////        }
+////        try {
+////            socket=new Socket("192.168.109.213",11000);
+//////            socket=new Socket("192.168.108.100",11000);
+////            inputStream=socket.getInputStream();
+////            inputStreamReader=new InputStreamReader(inputStream);
+////            bufferedReader=new BufferedReader(inputStreamReader);
+////            outputStream=socket.getOutputStream();
+////            printWriter=new PrintWriter(outputStream);
+////        }
+////        catch (IOException e){
+////            e.printStackTrace();
+////        }
+////        writeFile();
+////        Thread thread=new Thread(new start_socket());
+////        thread.start();
+////        try {
+////            System.out.println(thread.getState());
+////            thread.join();
+////        } catch (InterruptedException e) {
+////            e.printStackTrace();
+////        }
+////        while(true) {
+////            try {
+////                Thread.sleep(3000);
+////                StringBuffer message=new StringBuffer();
+////                message.append("3\n");
+////                for (int i = 0; i <22 ; i++) {
+////                    if (i==21){
+////                        message.append("10:");
+////                    }
+////                    else{
+////                        message.append("10,");
+////                    }
+////                }
+////                message.append("1,5,5");
+//////                System.out.println("request:"+message.toString());
+////                System.out.println("request send:"+System.currentTimeMillis());
+////                printWriter.println(message.toString());
+////                printWriter.flush();
+////                String mess = bufferedReader.readLine();
+//////                String mess1=bufferedReader.readLine();
+////                System.out.println(mess);
+////                System.out.println("get request result:"+System.currentTimeMillis());
+//////                System.out.println(mess1);
+////            } catch (IOException e) {
+////                e.printStackTrace();
+////            } catch (InterruptedException e) {
+////                e.printStackTrace();
+////            }
+////        }
+////        new Thread(new start_socket()).start();
+//
+//
+        init();
+        GraphDescription description = new DefaultGraphDescription(System.nanoTime(),
+                System.currentTimeMillis(), deviceSet, linkSet);
+        DefaultTopology defaultTopology = new DefaultTopology(ProviderId.NONE, description);
+        topologyVertexArrayList = new ArrayList<>(defaultTopology.getGraph().getVertexes());
+        for (TopologyVertex topologyVertex : topologyVertexArrayList) {
+            List<TopologyEdge> topologyEdgeList = new ArrayList<>(defaultTopology.getGraph().getEdgesFrom(topologyVertex));
+            topologyVertexListHashMap.put(topologyVertex, topologyEdgeList);
+        }
+        for (TopologyVertex topologyVertex : topologyVertexArrayList) {
 //            System.out.println("topologyVertex:"+topologyVertex);
 //            System.out.println("Edgelist:"+topologyVertexListHashMap.get(topologyVertex).toString());
 //            System.out.println("============================");
+        }
+
+////        writeFile();
+////        System.out.println(defaultTopology.getGraph().toString());
+//
+////        Set<List<TopologyEdge>> result=new HashSet<>();
+//////
+//////        double startTime=System.currentTimeMillis();
+//////        dfsFindAllRoutes(new DefaultTopologyVertex(deviceIdSet.get(0)),
+//////                new DefaultTopologyVertex(deviceIdSet.get(3))
+//////                ,new ArrayList<>(),new ArrayList<>(),defaultTopology.getGraph(),result);
+//////        result.forEach(linkSet->{
+//////            System.out.println(linkSet.toString());
+//////        });
+//////        System.out.println(System.currentTimeMillis()-startTime);
+//////        System.out.println("==============================================");
+////        BFSFindAllPath(new DefaultTopologyVertex(deviceIdSet.get(0)),
+////                        new DefaultTopologyVertex(deviceIdSet.get(3))
+////                        ,defaultTopology.getGraph());
+        System.out.println("==============================================");
+        double startTime1 = System.currentTimeMillis();
+        BFSFindAllPath1(new DefaultTopologyVertex(deviceIdSet.get(0)),
+                new DefaultTopologyVertex(deviceIdSet.get(3))
+                , defaultTopology.getGraph());
+        System.out.println(System.currentTimeMillis() - startTime1);
+
+//////        Set<TopologyVertex> topologyVertices=defaultTopology.getGraph().getVertexes();
+//////        TopologyEdge topologyEdge=(TopologyEdge) defaultTopology.getGraph()
+//////                    .getEdgesFrom((TopologyVertex) topologyVertices.toArray()[0]).toArray()[0];
+//////        ScalarWeight weight=(ScalarWeight)linkWeigherTool.weight(topologyEdge);
+//////        double ss=weight.value();
+//////        System.out.println(ss+10);
+////        //
+//////   System.out.println(defaultTopology.getGraph().getVertexes().toString());
+//////        Iterator<TopologyVertex> iterator=defaultTopology.getGraph().getVertexes().iterator();
+//////        while(iterator.hasNext()){
+//////            TopologyVertex topologyVertex=iterator.next();
+//////            System.out.println(defaultTopology.getGraph().getEdgesFrom(topologyVertex));
+//////        }
+//////        System.out.println("deviceCount:"+defaultTopology.deviceCount());
+        double startTime2 = System.currentTimeMillis();
+        Set<Path> disjointPaths = defaultTopology.getPaths(deviceIdSet.get(0), deviceIdSet.get(4));
+//        for (Path path : disjointPaths) {
+//            System.out.println(path.toString());
 //        }
-
-//        writeFile();
-//        System.out.println(defaultTopology.getGraph().toString());
-
-//        Set<List<TopologyEdge>> result=new HashSet<>();
-////
-////        double startTime=System.currentTimeMillis();
-////        dfsFindAllRoutes(new DefaultTopologyVertex(deviceIdSet.get(0)),
-////                new DefaultTopologyVertex(deviceIdSet.get(3))
-////                ,new ArrayList<>(),new ArrayList<>(),defaultTopology.getGraph(),result);
-////        result.forEach(linkSet->{
-////            System.out.println(linkSet.toString());
-////        });
-////        System.out.println(System.currentTimeMillis()-startTime);
-////        System.out.println("==============================================");
-//        BFSFindAllPath(new DefaultTopologyVertex(deviceIdSet.get(0)),
-//                        new DefaultTopologyVertex(deviceIdSet.get(3))
-//                        ,defaultTopology.getGraph());
-//        System.out.println("==============================================");
-////        double startTime1=System.currentTimeMillis();
-////        BFSFindAllPath1(new DefaultTopologyVertex(deviceIdSet.get(0)),
-////                new DefaultTopologyVertex(deviceIdSet.get(3))
-////                ,defaultTopology.getGraph());
-////        System.out.println(System.currentTimeMillis()-startTime1);
-////        Set<TopologyVertex> topologyVertices=defaultTopology.getGraph().getVertexes();
-////        TopologyEdge topologyEdge=(TopologyEdge) defaultTopology.getGraph()
-////                    .getEdgesFrom((TopologyVertex) topologyVertices.toArray()[0]).toArray()[0];
-////        ScalarWeight weight=(ScalarWeight)linkWeigherTool.weight(topologyEdge);
-////        double ss=weight.value();
-////        System.out.println(ss+10);
-//        //
-////   System.out.println(defaultTopology.getGraph().getVertexes().toString());
-////        Iterator<TopologyVertex> iterator=defaultTopology.getGraph().getVertexes().iterator();
-////        while(iterator.hasNext()){
-////            TopologyVertex topologyVertex=iterator.next();
-////            System.out.println(defaultTopology.getGraph().getEdgesFrom(topologyVertex));
+        System.out.println(System.currentTimeMillis()-startTime2);
+    }
+////        System.out.println("===============================");
+////////        System.out.println("path:"+defaultTopology.getDisjointPaths(deviceIdSet.get(1),deviceIdSet.get(3)));
+////////        System.out.println("path:"+defaultTopology.getPaths(deviceIdSet.get(1),deviceIdSet.get(3)).toString());
+//////        Stream<Path> pathList=defaultTopology.getKShortestPaths(deviceIdSet.get(0),deviceIdSet.get(3));
+//////        pathList.forEach(path -> {
+//////            System.out.println(path.toString());
+//////        });
+//////        System.out.println("==============================");
+////        Set<Path> paths=defaultTopology.getPaths(deviceIdSet.get(0),deviceIdSet.get(3),new TestWeight());
+////        for (Path path:paths){
+////            System.out.println(path.toString());
 ////        }
-////        System.out.println("deviceCount:"+defaultTopology.deviceCount());
-//        System.out.println(System.currentTimeMillis());
-//        Set<Path> disjointPaths=defaultTopology.getPaths(deviceIdSet.get(0),deviceIdSet.get(3));
-//        for (Path path:disjointPaths){
-//            System.out.println(path.toString());
-//        }
-//        System.out.println(System.currentTimeMillis());
-//        System.out.println("===============================");
-//////        System.out.println("path:"+defaultTopology.getDisjointPaths(deviceIdSet.get(1),deviceIdSet.get(3)));
-//////        System.out.println("path:"+defaultTopology.getPaths(deviceIdSet.get(1),deviceIdSet.get(3)).toString());
-////        Stream<Path> pathList=defaultTopology.getKShortestPaths(deviceIdSet.get(0),deviceIdSet.get(3));
-////        pathList.forEach(path -> {
-////            System.out.println(path.toString());
+//
+//////        System.out.println(defaultTopology.getCluster(deviceIdSet.get(1)));
+//////        System.out.println(defaultTopology.isBroadcastPoint(new ConnectPoint(deviceIdSet.get(1),PortNumber.portNumber(3))));
+////        System.out.println(defaultTopology.getClusters().toString());
+////        System.out.println(defaultTopology.isInfrastructure(new ConnectPoint(deviceIdSet.get(1),PortNumber.portNumber(10))));
+////        TopologyGraph graph=  defaultTopology.getGraph();
+////        System.out.println(graph.toString());
+////        Set<TopologyEdge> topologyVertices=defaultTopology.getGraph().getEdgesFrom(new DefaultTopologyVertex(deviceIdSet.get(0)));
+////        System.out.println(topologyVertices.toString());
+//
+////        for (TopologyVertex topologyVertex:defaultTopology.getGraph().getVertexes()){
+////            for (TopologyEdge topologyEdge:defaultTopology.getGraph().getEdgesTo(topologyVertex)){
+////                System.out.println(topologyEdge);
+////            }
+////        }
+//////        System.out.println(defaultTopology.getGraph());
+////        defaultTopology.getGraph().getVertexes().forEach(topologyVertex -> {
+////            System.out.println(topologyVertex.deviceId());
 ////        });
-////        System.out.println("==============================");
-//        Set<Path> paths=defaultTopology.getPaths(deviceIdSet.get(0),deviceIdSet.get(3),new TestWeight());
-//        for (Path path:paths){
-//            System.out.println(path.toString());
-//        }
-
-////        System.out.println(defaultTopology.getCluster(deviceIdSet.get(1)));
-////        System.out.println(defaultTopology.isBroadcastPoint(new ConnectPoint(deviceIdSet.get(1),PortNumber.portNumber(3))));
-//        System.out.println(defaultTopology.getClusters().toString());
-//        System.out.println(defaultTopology.isInfrastructure(new ConnectPoint(deviceIdSet.get(1),PortNumber.portNumber(10))));
-//        TopologyGraph graph=  defaultTopology.getGraph();
-//        System.out.println(graph.toString());
-//        Set<TopologyEdge> topologyVertices=defaultTopology.getGraph().getEdgesFrom(new DefaultTopologyVertex(deviceIdSet.get(0)));
-//        System.out.println(topologyVertices.toString());
-
-//        for (TopologyVertex topologyVertex:defaultTopology.getGraph().getVertexes()){
-//            for (TopologyEdge topologyEdge:defaultTopology.getGraph().getEdgesTo(topologyVertex)){
-//                System.out.println(topologyEdge);
-//            }
-//        }
-////        System.out.println(defaultTopology.getGraph());
-//        defaultTopology.getGraph().getVertexes().forEach(topologyVertex -> {
-//            System.out.println(topologyVertex.deviceId());
-//        });
-//        for (Link Link:defaultTopology.getClusterLinks(defaultTopology.getCluster(ClusterId.clusterId(0)))){
-//            System.out.println(Link.toString());
-//        }
-
-//        Set<Path> paths;
-//        paths=defaultTopology.getPaths(deviceIdSet.get(0),deviceIdSet.get(2));
-//        System.out.println(paths.toString());
-//        System.out.println(((Path)paths.toArray()[0]).links().size());
-////        System.out.println(paths.count());
-//        paths.forEach(path -> {
-//            path.links().forEach(link -> {
-//                System.out.println(link.toString());
-//            });
-//            System.out.println("===========================================");
-////            System.out.println(path.toString());
-//        });
-
-//        System.out.println(new ScalarWeight(0.0D).toString());
-//        Set<Path> paths=new HashSet<>();
-//        paths=defaultTopology.getPaths(deviceIdSet.get(0),deviceIdSet.get(3),WEIGHT,-1);
-//        System.out.println(paths.size());
-//        paths.forEach(path -> {
+////        for (Link Link:defaultTopology.getClusterLinks(defaultTopology.getCluster(ClusterId.clusterId(0)))){
+////            System.out.println(Link.toString());
+////        }
+//
+////        Set<Path> paths;
+////        paths=defaultTopology.getPaths(deviceIdSet.get(0),deviceIdSet.get(2));
+////        System.out.println(paths.toString());
+////        System.out.println(((Path)paths.toArray()[0]).links().size());
+//////        System.out.println(paths.count());
+////        paths.forEach(path -> {
 ////            path.links().forEach(link -> {
 ////                System.out.println(link.toString());
 ////            });
 ////            System.out.println("===========================================");
-//            System.out.println(path.toString());
-//        });
-    }
-//    class thread_test implements Runnable{
-//        @Override
-//        public void run() {
-//            System.out.println("thread_test");
-//        }
+//////            System.out.println(path.toString());
+////        });
+//
+////        System.out.println(new ScalarWeight(0.0D).toString());
+////        Set<Path> paths=new HashSet<>();
+////        paths=defaultTopology.getPaths(deviceIdSet.get(0),deviceIdSet.get(3),WEIGHT,-1);
+////        System.out.println(paths.size());
+////        paths.forEach(path -> {
+//////            path.links().forEach(link -> {
+//////                System.out.println(link.toString());
+//////            });
+//////            System.out.println("===========================================");
+////            System.out.println(path.toString());
+////        });
 //    }
-    class start_socket implements Runnable{
-        @Override
-        public void run() {
+////    class thread_test implements Runnable{
+////        @Override
+////        public void run() {
+////            System.out.println("thread_test");
+////        }
+////    }
+////    @Test
+////    public void request_drl_test(){
+////        try {
+////            socket=new Socket("192.168.109.213",11000);
+////            inputStream=socket.getInputStream();
+////            inputStreamReader=new InputStreamReader(inputStream);
+////            bufferedReader=new BufferedReader(inputStreamReader);
+////            outputStream=socket.getOutputStream();
+////            printWriter=new PrintWriter(outputStream);
+////        } catch (IOException e) {
+////            e.printStackTrace();
+////        }
+////       while(true) {
+////                try {
+////                    Thread.sleep(3000);
+////                    StringBuffer message=new StringBuffer();
+////                    message.append("3\n");
+////                    for (int i = 0; i <22 ; i++) {
+////                        if (i==21){
+////                            message.append("10:");
+////                        }
+////                        else{
+////                            message.append("10,");
+////                        }
+////                    }
+////                    message.append("1,5,9");
+////                    System.out.println("request:"+message.toString());
+////                    printWriter.println(message.toString());
+////                    printWriter.flush();
+////                    String mess = bufferedReader.readLine();
+////                    String mess1=bufferedReader.readLine();
+////                    System.out.println(mess);
+////                    System.out.println(mess1);
+////                } catch (IOException e) {
+////                    e.printStackTrace();
+////                } catch (InterruptedException e) {
+////                    e.printStackTrace();
+////                }
+////        }
+////
+////    }
+class client_listen implements Runnable{
+    private Socket socket;
+    private  InputStream inputStream;
+    private PrintWriter printWriter;
+    private  InputStreamReader inputStreamReader;
+
+    client_listen(Socket socket,InputStream inputStream,OutputStream outputStream)  {
+        this.socket=socket;
+        this.inputStream=inputStream;
+        this.printWriter=new PrintWriter(outputStream);
+    }
+    @Override
+    public void run() {
+        boolean flag=true;
+        try {
+            Thread.sleep(1000);
+            while (true) {
+                if (flag) {
+                    StringBuffer stringBuffer = new StringBuffer();
+                    stringBuffer.append("1\n");
+                    for (TopologyVertex topologyVertex : topologyVertexArrayList) {
+                        stringBuffer.append(topologyVertex.toString().split(":")[1].replaceFirst("^0*", ""));
+                        for (TopologyEdge topologyEdge : topologyVertexListHashMap.get(topologyVertex)) {
+                            stringBuffer.append("," + topologyEdge.dst().toString().split(":")[1].replaceFirst("^0*", ""));
+                        }
+                        stringBuffer.append(":" + "10" + "\n");
+                    }
+                    flag = false;
+                    System.out.println(stringBuffer.length());
+                    stringBuffer.deleteCharAt(stringBuffer.length() - 1);
+                    System.out.println(stringBuffer.length());
+                    System.out.println(stringBuffer.toString());
+                    printWriter.print(stringBuffer.toString());
+                    printWriter.flush();
+                }
+                inputStreamReader=new InputStreamReader(inputStream);
+                String message=new BufferedReader(inputStreamReader).readLine();
+                if (message.equals("3")){
+                    System.out.println(message);
+                    drl_train_complete=true;
+                    break;
+                }
+//                System.out.println(new BufferedReader(inputStreamReader).readLine());
+
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+class start_socket implements Runnable{
+    @Override
+    public void run() {
+        boolean flag=true;
+        while (true) {
             try {
-                String message="1";
-//                System.out.println(message);
-                printWriter.println(message);
-                printWriter.flush();
-                String mess=bufferedReader.readLine();
+                if (flag){
+                    StringBuffer stringBuffer = new StringBuffer();
+                    stringBuffer.append("1\n");
+                    for (TopologyVertex topologyVertex : topologyVertexArrayList) {
+                        stringBuffer.append(topologyVertex.toString().split(":")[1].replaceFirst("^0*", ""));
+                        for (TopologyEdge topologyEdge : topologyVertexListHashMap.get(topologyVertex)) {
+                            stringBuffer.append("," + topologyEdge.dst().toString().split(":")[1].replaceFirst("^0*", ""));
+                        }
+                        stringBuffer.append(":" + "10" + "\n");
+                    }
+                    flag=false;
+                    stringBuffer.deleteCharAt(stringBuffer.length()-1);
+                    System.out.println(stringBuffer.toString());
+                    printWriter.print(stringBuffer.toString());
+                    printWriter.flush();
+                }
+                String mess = bufferedReader.readLine();
+                if (mess.equals("2")){
+                    System.out.println("receive:"+mess);
+                    drl_train_complete=true;
+                    break;
+                }
                 System.out.println(mess);
-            }catch (IOException e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
+}
     private void writeFile() {
         BufferedWriter bufferedWriter=null;
         StringBuffer stringBuffer=new StringBuffer();
@@ -234,6 +377,7 @@ public class newTopologyTest {
                 }
                 stringBuffer.append(":"+"10"+"\n");
             }
+//            System.out.println(stringBuffer.toString());
            bufferedWriter.write(stringBuffer.toString());
            bufferedWriter.close();
         }
@@ -270,7 +414,7 @@ public class newTopologyTest {
     }
 
     public void DeviceIdSet(){
-        for (int i = 1; i <=10; i++) {
+        for (int i = 1; i <=9; i++) {
             DeviceId deviceId=DeviceId.deviceId("hcp:"+String.format("%016x",i));
             deviceIdSet.add(deviceId);
         }
@@ -278,8 +422,8 @@ public class newTopologyTest {
     }
 
     public void InterLink(){
-        for (int i = 0; i <10 ; i++) {
-            if (i!=9){
+        for (int i = 0; i <9 ; i++) {
+            if (i!=8){
                 ConnectPoint srcConnec=new ConnectPoint(deviceIdSet.get(i),PortNumber.portNumber(0));
                 ConnectPoint dstConnec=new ConnectPoint(deviceIdSet.get(i+1),PortNumber.portNumber(1));
                 Link link=getLink(srcConnec,dstConnec);
@@ -400,19 +544,19 @@ public class newTopologyTest {
             }
 
         }
-        result.forEach(ll->{
-            System.out.println(ll.toString());
-        });
+//        result.forEach(ll->{
+////            System.out.println(ll.toString());
+//        });
 
-        System.out.println("============================");
-        Set<Path> pathSet=CalculatePathCost(result);
-        Path path1=selectPath(pathSet);
-        System.out.println(path1.src());
-        System.out.println(path1.dst());
-        path1.links().forEach(link -> {
-            System.out.println(link);
-        });
-        System.out.println(path1.toString());
+////        System.out.println("============================");
+//        Set<Path> pathSet=CalculatePathCost(result);
+//        Path path1=selectPath(pathSet);
+//        System.out.println(path1.src());
+//        System.out.println(path1.dst());
+//        path1.links().forEach(link -> {
+//            System.out.println(link);
+//        });
+//        System.out.println(path1.toString());
 
     }
 
@@ -515,4 +659,5 @@ public class newTopologyTest {
 
         passedDevice.remove(src);
     }
+
 }

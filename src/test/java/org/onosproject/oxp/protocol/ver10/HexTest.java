@@ -3,6 +3,7 @@ package org.onosproject.oxp.protocol.ver10;
 import org.junit.Test;
 import org.onlab.packet.IpAddress;
 import org.onosproject.net.DeviceId;
+import org.onosproject.net.Path;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,20 +18,42 @@ import java.util.Map;
 public class HexTest {
     @Test
     public  void main() {
-        Map<String,Long> hashmap=new HashMap<>();
-        IpAddress ipAddress=IpAddress.valueOf("192.168.109.12");
-        IpAddress dst=IpAddress.valueOf("192.168.109.13");
-        String ss=ipAddress.toString()+" "+dst.toString();
-        hashmap.put(ss,System.currentTimeMillis());
-        long s=hashmap.get(ss);
-        System.out.println(hashmap.containsKey("1"));
-        System.out.println(s);
-        System.out.println(hashmap.toString());
-        IpAddress ipAddress1=IpAddress.valueOf("192.168.109.12");
-        IpAddress dst2=IpAddress.valueOf("192.168.109.13");
-        String ss1=ipAddress.toString()+" "+dst.toString();
-        hashmap.put(ss1,System.currentTimeMillis());
-        System.out.println(hashmap.toString());
+        System.out.println(String.format("%016d",10));
+        System.out.println(String.format("%016x",10));
+//        Map<String,Long> hashmap=new HashMap<>();
+//        Thread thread=new Thread(){
+//            @Override
+//            public void run() {
+//                while (true){
+//                    System.out.println("wo ai ni");
+//                    try {
+//                        Thread.sleep(1000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        };
+//        thread.start();
+//        System.out.println("hao a ");
+//        try {
+//            thread.join();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        IpAddress ipAddress=IpAddress.valueOf("192.168.109.12");
+//        IpAddress dst=IpAddress.valueOf("192.168.109.13");
+//        String ss=ipAddress.toString()+" "+dst.toString();
+//        hashmap.put(ss,System.currentTimeMillis());
+//        long s=hashmap.get(ss);
+//        System.out.println(hashmap.containsKey("1"));
+//        System.out.println(s);
+//        System.out.println(hashmap.toString());
+//        IpAddress ipAddress1=IpAddress.valueOf("192.168.109.12");
+//        IpAddress dst2=IpAddress.valueOf("192.168.109.13");
+//        String ss1=ipAddress.toString()+" "+dst.toString();
+//        hashmap.put(ss1,System.currentTimeMillis());
+//        System.out.println(hashmap.toString());
 //        System.out.println(ss);
 //        System.out.println (String.format("%06x",2222));
     }

@@ -83,17 +83,17 @@ public class HCPSbpMessageTest {
     }
     @Test
     public void SbpForwardRequestTest() throws HCPParseError {
-        IpAddress src=IpAddress.valueOf("192.168.109.12");
-        IPv4Address srcipAddress=IPv4Address.of(src.toOctets());
-        IPv4Address dstIpaddress=IPv4Address.of("192.168.109.13");
+        IpAddress ipAddress=IpAddress.valueOf("192.168.109.13");
+        IPv4Address srcipAddress=IPv4Address.of(ipAddress.toString());
+        IPv4Address dstIpaddress=IPv4Address.of("192.168.109.14");
         ChannelBuffer buffer=ChannelBuffers.dynamicBuffer();
         List<HCPVportHop> vportHops=new ArrayList<>();
         HCPVportHop vportHop=HCPVportHop.of(HCPVport.ofShort((short)1),0);
-        HCPVportHop vportHop2=HCPVportHop.of(HCPVport.ofShort((short)2),6);
+//        HCPVportHop vportHop2=HCPVportHop.of(HCPVport.ofShort((short)2),6);
         vportHops.add(vportHop);
 //        vportHops.add(vportHop2);
         HCPForwardingRequestVer10 forwardingRequestVer10=HCPForwardingRequestVer10
-                .of(srcipAddress,dstIpaddress,10,Ethernet.TYPE_IPV6,(byte)6,vportHops);
+                .of(srcipAddress,dstIpaddress,10,(short)2,(byte)6,vportHops);
         Set<HCPSbpFlags> flagsSet=new HashSet<>();
         flagsSet.add(HCPSbpFlags.DATA_EXITS);
         HCPSbp hcpSbp =getMessageFactry().buildSbp()
@@ -114,9 +114,9 @@ public class HCPSbpMessageTest {
         System.out.println("messageRev sbpFlags:"+messageRev.getFlags());
         System.out.println("messageRev sbpDataLength:"+messageRev.getDataLength());
         HCPForwardingRequest hcpForwardingRequest=(HCPForwardingRequest) messageRev.getSbpCmpData();
-        System.out.println("hcpforwarding request dstIpaddress:"+hcpForwardingRequest.getDstIpAddress().toString());
+        System.out.println("hcpforwarding request dstIpaddress:"+hcpForwardingRequest.getDstIpAddress());
         System.out.println("hcpforwarding request srcIpaddress:"+hcpForwardingRequest.getSrcIpAddress());
-        System.out.println("hcpforwarding request type:"+(Ethernet.TYPE_IPV4==hcpForwardingRequest.getEthType()));
+        System.out.println("hcpforwarding request type:"+hcpForwardingRequest.getEthType());
         System.out.println("hcpforwarding request qos:"+hcpForwardingRequest.getQos());
         List<HCPVportHop> vportHops1=hcpForwardingRequest.getvportHopList();
         vportHops1.forEach(hcpVportHop -> {

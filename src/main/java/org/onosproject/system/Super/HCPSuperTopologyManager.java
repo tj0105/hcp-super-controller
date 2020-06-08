@@ -328,7 +328,6 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
      */
     private Set<Path> CalculatePathCost(Set<List<TopologyEdge>> pathSet){
         Set<Path> allResult=new HashSet<>();
-
         pathSet.forEach(path->{
             ScalarWeight weight=(ScalarWeight) maxPathWeight(path);
             allResult.add(parseEdgetoLink(path,weight));
@@ -532,7 +531,7 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
             if (hcpHost.getHostState().equals(HCPHostState.ACTIVE)){
                 map.put(hostId,hcpHost);
             }else{
-                log.info("1111111111111111111111111111111111111111111111");
+//                log.info("1111111111111111111111111111111111111111111111");
                 map.remove(hostId);
             }
         }

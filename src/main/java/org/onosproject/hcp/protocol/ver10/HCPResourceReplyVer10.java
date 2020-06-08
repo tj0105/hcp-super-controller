@@ -26,7 +26,6 @@ public class HCPResourceReplyVer10 implements HCPResourceReply {
     }
 
     public static HCPResourceReply read(ChannelBuffer bb,int dataLength) throws HCPParseError{
-        IPv4Address srcIpAddress=IPv4Address.read4Bytes(bb);
         IPv4Address dstIpAddress=IPv4Address.read4Bytes(bb);
         List<HCPVportHop> vportHops=ChannelUtils.readList(bb,dataLength,HCPVportHopVer10.READER);
         return of(dstIpAddress,vportHops);

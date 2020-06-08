@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.onosproject.system.Super.HCPSuperRouting" activate="activate" deactivate="deactivate">
     <implementation class="org.onosproject.system.Super.HCPSuperRouting"/>
+    <service servicefactory="false">
+        <provide interface="org.onosproject.api.Super.HCPSuperRouteService"/>
+    </service>
     <property name="service.pid" value="org.onosproject.system.Super.HCPSuperRouting"/>
     <reference name="superController" interface="org.onosproject.api.Super.HCPSuperController" cardinality="1..1" policy="static" bind="bindSuperController" unbind="unbindSuperController"/>
     <reference name="superTopoServices" interface="org.onosproject.api.Super.HCPSuperTopoServices" cardinality="1..1" policy="static" bind="bindSuperTopoServices" unbind="unbindSuperTopoServices"/>

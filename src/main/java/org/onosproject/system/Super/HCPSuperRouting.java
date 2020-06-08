@@ -9,6 +9,7 @@ import org.onlab.packet.MacAddress;
 import org.onosproject.api.HCPDomain;
 import org.onosproject.api.HCPDomainMessageListener;
 import org.onosproject.api.Super.HCPSuperController;
+import org.onosproject.api.Super.HCPSuperRouteService;
 import org.onosproject.api.Super.HCPSuperTopoServices;
 import org.onosproject.hcp.protocol.*;
 import org.onosproject.hcp.protocol.ver10.HCPForwardingReplyVer10;
@@ -27,7 +28,8 @@ import java.util.*;
 import java.util.concurrent.*;
 
 @Component(immediate = true)
-public class HCPSuperRouting {
+@Service
+public class HCPSuperRouting implements HCPSuperRouteService {
 
     private final Logger log= LoggerFactory.getLogger(HCPSuperRouting.class);
 
@@ -43,9 +45,9 @@ public class HCPSuperRouting {
     public static volatile DomainId RequestdomainId=null;
     private ConcurrentHashMap<HCPHost,Map<PortNumber,Integer>> hostVportHop;
     private ConcurrentHashMap<String,Long> processFlowTime;
-    private static ExecutorService executorService=new ThreadPoolExecutor(10,10,
-            60, TimeUnit.SECONDS,new ArrayBlockingQueue<>(10));
-    private static final long FLOW_AGE=2000;
+//    private static ExecutorService executorService=new ThreadPoolExecutor(10,10,
+//            60, TimeUnit.SECONDS,new ArrayBlockingQueue<>(10));
+    private static final long FLOW_AGE=5000;
     @Activate
     public void activate(){
         superController.addMessageListener(domainMessageListener);
@@ -60,6 +62,11 @@ public class HCPSuperRouting {
         hostVportHop.clear();
         processFlowTime=new ConcurrentHashMap<>();
         log.info("============HCPSuperRouting Stoped===============");
+    }
+
+    @Override
+    public Map<PortNumber, Integer> getHostPortHop(HCPHost host) {
+        return hostVportHop.get(host);
     }
 
     private void processArp(DomainId domainId,PortNumber portNumber,Ethernet eth){
@@ -92,6 +99,7 @@ public class HCPSuperRouting {
     }
 
     private  void sendForwardingReplyToDomain(DeviceId deviceId,IpAddress src,IpAddress dst,HCPVport inport,HCPVport outport){
+        log.info("===================sendForwardingReplyToDomain=============inport=={}====output==={}",inport.toString(),outport.toString());
         IPv4Address srcAddress=IPv4Address.of(src.toOctets());
         IPv4Address dstAddress=IPv4Address.of(dst.toOctets());
         HCPDomain  domain=superController.getHCPDomain(deviceId.toString().substring("hcp:".length()));
@@ -132,15 +140,16 @@ public class HCPSuperRouting {
 
     }
     private  void processFlowRequest(DomainId domainId,IpAddress srcAddress,IpAddress targetAddress,List<HCPVportHop> vportHops){
-         Set<HCPHost> srchosts=superTopoServices.getHostByIp(srcAddress);
+//        log.info("====================start====process===request========");
+        Set<HCPHost> srchosts=superTopoServices.getHostByIp(srcAddress);
          Set<HCPHost> dsthosts=superTopoServices.getHostByIp(targetAddress);
          HCPHost srcHost=(HCPHost) srchosts.toArray()[0];
          HCPHost dstHost=(HCPHost) dsthosts.toArray()[0];
          Map<PortNumber,Integer> vportIntegerMap=hostVportHop.get(srcHost);
-        if (!hostVportHop.containsKey(dstHost)){
-            log.info("========================ResourceRequest===============");
-            sendRequestToDstDomain(srcAddress,targetAddress,dstHost);
-        }
+//        if (!hostVportHop.containsKey(dstHost)){
+////            log.info("========================ResourceRequest===============");
+//            sendRequestToDstDomain(srcAddress,targetAddress,dstHost);
+//        }
          if (vportIntegerMap==null){
              vportIntegerMap=new HashMap<>();
              hostVportHop.put(srcHost,vportIntegerMap);
@@ -148,7 +157,7 @@ public class HCPSuperRouting {
          for (HCPVportHop hcpVportHop:vportHops){
              vportIntegerMap.put(PortNumber.portNumber(hcpVportHop.getVport().getPortNumber()),hcpVportHop.getHop());
          }
-         log.info("===srchost{},dsthost{},vportIntergerMap{}===",srcHost.toString(),dstHost.toString(),vportIntegerMap.toString());
+//         log.info("===srchost{},dsthost{},vportIntergerMap{}===",srcHost.toString(),dstHost.toString(),vportIntegerMap.toString());
          if (dsthosts.isEmpty()){
              return ;
          }
@@ -167,21 +176,21 @@ public class HCPSuperRouting {
              paths=superTopoServices.getLoadBlancePath(srcDeviceId,dstDeviceId);
 //             log.info("===============paths==={}",paths.toString());
              if (dstVportHops==null){
-                 while(dstVportHops==null){
-                     try {
-                         Thread.sleep(2);
-                         dstVportHops=hostVportHop.get(dstHost);
-                     } catch (InterruptedException e) {
-                         e.printStackTrace();
-                     }
-                 }
-                 log.info("===============dstvportsHops is null {}===========",dstVportHops);
+//                 while(dstVportHops==null){
+//                     try {
+//                         Thread.sleep(2);
+//                         dstVportHops=hostVportHop.get(dstHost);
+//                     } catch (InterruptedException e) {
+//                         e.printStackTrace();
+//                     }
+//                 }
+//                 log.info("===============dstvportsHops is null {}===========",dstVportHops);
                   path=selectPath(paths,vportIntegerMap,dstVportHops);
-                 log.info("===========,path={}",path.toString());
+//                 log.info("===========,path={}",path.toString());
              }else{
-                 log.info("=========dstvportsHops have={}===",dstVportHops.toString());
+//                 log.info("=========dstvportsHops have={}===",dstVportHops.toString());
                   path=selectPath(paths,vportIntegerMap,dstVportHops);
-                 log.info("===========path={}",path.toString());
+//                 log.info("===========path={}",path.toString());
              }
 
          }
@@ -191,46 +200,34 @@ public class HCPSuperRouting {
          Link former =null;
          for (Link link:path.links()){
              boolean flag=false;
-             former=link;
             if (link.src().deviceId().equals(srcDeviceId)||link.dst().deviceId().equals(dstDeviceId)){
                 if (link.src().deviceId().equals(srcDeviceId)){
+                    former=link;
                     flag=true;
                     sendForwardingReplyToDomain(srcDeviceId,srcAddress,
                             targetAddress,HCPVport.OUT_PORT,HCPVport.ofShort((short)link.src().port().toLong()));
-                log.info("=======deviceId={}==HCPVport==={}=",srcDeviceId,HCPVport.ofShort((short)link.src().port().toLong()).toString());
+//                log.info("=======deviceId={}==HCPVport==={}=",srcDeviceId,HCPVport.ofShort((short)link.src().port().toLong()).toString());
                 }
                 if (link.dst().deviceId().equals(dstDeviceId)){
                     sendForwardingReplyToDomain(dstDeviceId,srcAddress,targetAddress,HCPVport.IN_PORT,HCPVport.ofShort((short)link.dst().port().toLong()));
-                    log.info("=======deviceId={}==HCPVport==={}=",dstDeviceId,HCPVport.ofShort((short)link.dst().port().toLong()).toString());
+//                    log.info("=======deviceId={}==HCPVport==={}=",dstDeviceId,HCPVport.ofShort((short)link.dst().port().toLong()).toString());
                 }
                 if (flag)
                     continue;
             }
-            log.info("========================ssssssssssssssssssssssssss============================");
+//            log.info("========================ssssssssssssssssssssssssss============================");
             sendForwardingReplyToDomain(link.src().deviceId(),srcAddress,targetAddress,
                     HCPVport.ofShort((short)former.dst().port().toLong()),HCPVport.ofShort((short)link.src().port().toLong()));
+            former=link;
         }
-
+        log.info("===========path={}",path.toString());
     }
-//    class pathCallable implements Callable<Path>{
-//        private Set<Path> pathset;
-//        private Map<PortNumber,Integer> srcVportHops;
-//        private HCPHost dstHost;
-//        pathCallable(Set<Path> paths,Map<PortNumber,Integer> srcVportHops,HCPHost dstHost){
-//            this.pathset=paths;
-//            this.srcVportHops=srcVportHops;
-//            this.dstHost=dstHost;
-//        }
-//        @Override
-//        public Path call() throws Exception {
-//
-//        }
-//    }
+
     private Path selectPath(Set<Path> pathSet,Map<PortNumber,Integer> srcVportHops,Map<PortNumber,Integer> dstVportHops){
         List<Path> pathList=new ArrayList(pathSet);
         List<Path> newPath=new ArrayList<>();
         Link former=null;
-        log.info("===============paths11111111111==={}",pathSet.toString());
+//        log.info("===============paths11111111111==={}",pathSet.toString());
         for (Path path:pathList){
             double cost=0;
             for (Link link:path.links()){
@@ -270,7 +267,7 @@ public class HCPSuperRouting {
         }
         newPath.sort((p1, p2) -> ((ScalarWeight) p1.weight()).value() > ((ScalarWeight) p2.weight()).value()
                     ? 1 : (((ScalarWeight) p1.weight()).value() < ((ScalarWeight) p2.weight()).value()) ? -1 : 0);
-        log.info("==============newpath={}",newPath.toString());
+//        log.info("==============newpath={}",newPath.toString());
         return newPath.isEmpty()?null:newPath.get(0);
     }
 
@@ -302,6 +299,8 @@ public class HCPSuperRouting {
         superController.sendHCPMessge(domainId,hcpSbp);
 
     }
+
+
     class InternalDomainMessageListener implements HCPDomainMessageListener{
 
         @Override
@@ -317,40 +316,51 @@ public class HCPSuperRouting {
                 ethernet=superController.parseEthernet(hcpPacketIn.getData());
             }else if(sbp.getSbpCmpType()==HCPSbpCmpType.FLOW_FORWARDING_REQUEST){
                 HCPForwardingRequest hcpForwardingRequest=(HCPForwardingRequest) sbp.getSbpCmpData();
-                log.info("=============FlOWRequest=====================");
+//                log.info("=============FlOWRequest=====================");
                 IpAddress srcAddrss=IpAddress.valueOf(hcpForwardingRequest.getSrcIpAddress().toString());
                 IpAddress targetAddress=IpAddress.valueOf(hcpForwardingRequest.getDstIpAddress().toString());
                 int EthetType = hcpForwardingRequest.getEthType();
                 List<HCPVportHop> vportHops=hcpForwardingRequest.getvportHopList();
                 String srcip=srcAddrss.toString()+" "+targetAddress.toString();
                 long nowTime=System.currentTimeMillis();
-                if (!processFlowTime.containsKey(srcip)){
-                    processFlowTime.put(srcip,nowTime);
-                    new Thread(){
-                        @Override
-                        public void run(){
-                            processFlowRequest(domainId,srcAddrss,targetAddress,vportHops);
-                        }
-
-                    }.start();
-
-                }else{
-                    long beforeTime=processFlowTime.get(srcip);
-                    if (nowTime-beforeTime>FLOW_AGE){
-                        processFlowTime.put(srcip,nowTime);
-                        new Thread(){
-                            @Override
-                            public void run(){
-                                processFlowRequest(domainId,srcAddrss,targetAddress,vportHops);
-                            }
-
-                        }.start();
-                    }
+                if (!processFlowTime.contains(srcip)){
+                    processFlowRequest(domainId,srcAddrss,targetAddress,vportHops);
                 }
+                else{
+                    long beforetime=processFlowTime.get(srcip);
+                    if (nowTime-beforetime>FLOW_AGE){
+                        processFlowTime.put(srcip,nowTime);
+                        processFlowRequest(domainId,srcAddrss,targetAddress,vportHops);
+                    }
+
+                }
+//                if (!processFlowTime.containsKey(srcip)){
+//                    processFlowTime.put(srcip,nowTime);
+//                    new Thread(){
+//                        @Override
+//                        public void run(){
+//                            processFlowRequest(domainId,srcAddrss,targetAddress,vportHops);
+//                        }
+//
+//                    }.start();
+//
+//                }else{
+//                    long beforeTime=processFlowTime.get(srcip);
+//                    if (nowTime-beforeTime>FLOW_AGE){
+//                        processFlowTime.put(srcip,nowTime);
+//                        new Thread(){
+//                            @Override
+//                            public void run(){
+//                                processFlowRequest(domainId,srcAddrss,targetAddress,vportHops);
+//                            }
+//
+//                        }.start();
+//                    }
+//                }
                 return ;
             }else if (sbp.getSbpCmpType()==HCPSbpCmpType.RESOURCE_REPLY){
                 HCPResourceReply hcpResourceReply=(HCPResourceReply) sbp.getSbpCmpData();
-                log.info("===============hcpResourceReply============{}",hcpResourceReply.toString());
+//                log.info("===============hcpResourceReply============{}",hcpResourceReply.toString());
 //                IpAddress srcAddrss=IpAddress.valueOf(hcpResourceReply.getSrcIpAddress().toString());
                 IpAddress targetAddress=IpAddress.valueOf(hcpResourceReply.getDstIpAddress().toString());
                 Set<HCPHost> dsthosts=superTopoServices.getHostByIp(targetAddress);
@@ -372,7 +382,7 @@ public class HCPSuperRouting {
             }
 
             if (ethernet.getEtherType()==Ethernet.TYPE_ARP){
-                log.info("============ARP========{}",(ARP)ethernet.getPayload());
+//                log.info("============ARP========{}",(ARP)ethernet.getPayload());
                 processArp(domainId,portNumber,ethernet);
                 return ;
             }

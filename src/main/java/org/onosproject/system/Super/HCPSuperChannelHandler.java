@@ -76,7 +76,7 @@ public class HCPSuperChannelHandler extends IdleStateAwareChannelHandler {
                 log.info("SuperController Received HCPFeaturesReply message {} {}",m.getDomainId(),m.getCapabilities().toString());
                 log.info("==============={}==============",m.getDomainId().toString());
                 h.hcpDomain.setDomainId(m.getDomainId());
-                log.info("==============={}==============",h.hcpDomain.getDomainId().toString());
+//                log.info("==============={}==============",h.hcpDomain.getDomainId().toString());
                 h.hcpDomain.setDeviceId(DeviceId.deviceId("hcp:"+h.hcpDomain.getDomainId().toString()));
                 h.hcpDomain.setCapabilities(m.getCapabilities());
                 h.hcpDomain.setHCPSbpType(m.getSbpType());
