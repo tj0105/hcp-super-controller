@@ -50,17 +50,17 @@ public class HCPSuperRouting implements HCPSuperRouteService {
     private static final long FLOW_AGE=5000;
     @Activate
     public void activate(){
-        superController.addMessageListener(domainMessageListener);
-        hostVportHop=new ConcurrentHashMap<>();
-        processFlowTime=new ConcurrentHashMap<>();
+//        superController.addMessageListener(domainMessageListener);
+//        hostVportHop=new ConcurrentHashMap<>();
+//        processFlowTime=new ConcurrentHashMap<>();
         log.info("============HCPSuperRouting Started===============");
     }
 
     @Deactivate
     public void deactivate(){
-        superController.removeMessageListener(domainMessageListener);
-        hostVportHop.clear();
-        processFlowTime=new ConcurrentHashMap<>();
+//        superController.removeMessageListener(domainMessageListener);
+//        hostVportHop.clear();
+//        processFlowTime.clear();
         log.info("============HCPSuperRouting Stoped===============");
     }
 

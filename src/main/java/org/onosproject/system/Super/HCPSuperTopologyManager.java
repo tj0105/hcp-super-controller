@@ -42,8 +42,7 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
     private TopologyService topologyService;
 
 
-    //监听DomainController发送过来的VPortStatus,
-    // Topo,Host,Sbp等消息，完成拓扑的构建
+
     private HCPDomainMessageListener domainMessageListener = new InternalDomainMessageListener();
     //监听DomainController上线
     private HCPDomainListener domainListener = new InternalHCPDomainListener();
@@ -77,31 +76,31 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
     final double MEASURE_TOLERANCE = 0.05;
     @Activate
     public void activate() {
-        vportMap = new HashMap<>();
-        vportDescribtionMap = new HashMap<>();
-        InterDomainLink = new HashSet<>();
-        hostMap = new HashMap<>();
-        vportLoadCapability = new HashMap<>();
-        vportMaxCapability = new HashMap<>();
-        IntraDomainLink = new HashMap<>();
-        IntraDomainLinkDescription = new HashMap<>();
-        superController.addMessageListener(domainMessageListener);
-        superController.addHCPDomainListener(domainListener);
+//        vportMap = new HashMap<>();
+//        vportDescribtionMap = new HashMap<>();
+//        InterDomainLink = new HashSet<>();
+//        hostMap = new HashMap<>();
+//        vportLoadCapability = new HashMap<>();
+//        vportMaxCapability = new HashMap<>();
+//        IntraDomainLink = new HashMap<>();
+//        IntraDomainLinkDescription = new HashMap<>();
+//        superController.addMessageListener(domainMessageListener);
+//        superController.addHCPDomainListener(domainListener);
         log.info("============HCPSuperController Topology Manager started==========");
     }
 
     @Deactivate
     public void deactive() {
-        superController.removeHCPDomainListener(domainListener);
-        superController.removeMessageListener(domainMessageListener);
-        vportDescribtionMap.clear();
-        vportMap.clear();
-        InterDomainLink.clear();
-        hostMap.clear();
-        vportMaxCapability.clear();
-        vportLoadCapability.clear();
-        IntraDomainLinkDescription.clear();
-        IntraDomainLink.clear();
+//        superController.removeHCPDomainListener(domainListener);
+//        superController.removeMessageListener(domainMessageListener);
+//        vportDescribtionMap.clear();
+//        vportMap.clear();
+//        InterDomainLink.clear();
+//        hostMap.clear();
+//        vportMaxCapability.clear();
+//        vportLoadCapability.clear();
+//        IntraDomainLinkDescription.clear();
+//        IntraDomainLink.clear();
         log.info("============HCPSuperController Topology Manager stopped==========");
     }
 

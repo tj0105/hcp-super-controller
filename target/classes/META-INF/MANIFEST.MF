@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1591583990731
+Bnd-LastModified: 1591795040482
 Build-Jdk: 1.8.0_161
 Built-By: ldy
 Bundle-Blueprint: OSGI-INF/blueprint/shell-config.xml
@@ -71,6 +71,7 @@ Import-Package: com.fasterxml.jackson.databind;version="[2.8,3)",com.fas
  e.blueprint;version="[1.0.0,2.0.0)",org.slf4j;version="[1.7,2)"
 Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
 Service-Component: OSGI-INF/org.onosproject.system.Super.HCPSuperControl
- lerImpl.xml,OSGI-INF/org.onosproject.system.Super.HCPSuperRouting.xml,O
- SGI-INF/org.onosproject.system.Super.HCPSuperTopologyManager.xml
+ lerImpl.xml,OSGI-INF/org.onosproject.system.Super.HCPSuperCbenchTest.xm
+ l,OSGI-INF/org.onosproject.system.Super.HCPSuperRouting.xml,OSGI-INF/or
+ g.onosproject.system.Super.HCPSuperTopologyManager.xml
 Tool: Bnd-3.0.0.201509101326

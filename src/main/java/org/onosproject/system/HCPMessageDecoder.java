@@ -10,6 +10,9 @@ import org.onosproject.hcp.protocol.HCPMessageReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @Author ldy
  * @Date: 20-2-29 下午4:11
@@ -25,7 +28,7 @@ public class HCPMessageDecoder extends FrameDecoder {
         }
         HCPMessageReader<HCPMessage> reader= HCPFactories.getGenericReader();
         HCPMessage message=reader.readFrom(channelBuffer);
-//        log.info("===============Decode Message========={}==========",message.getType());
+//        log.info("7===============Decode Message========={}==========",message.getType());
         return message;
     }
 }

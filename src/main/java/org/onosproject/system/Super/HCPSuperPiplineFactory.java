@@ -3,6 +3,7 @@ package org.onosproject.system.Super;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
+import org.jboss.netty.handler.codec.frame.FixedLengthFrameDecoder;
 import org.jboss.netty.handler.timeout.IdleStateHandler;
 import org.jboss.netty.handler.timeout.ReadTimeoutHandler;
 import org.jboss.netty.util.ExternalResourceReleasable;
@@ -42,6 +43,7 @@ public class HCPSuperPiplineFactory implements ChannelPipelineFactory,ExternalRe
         HCPSuperChannelHandler handler=new HCPSuperChannelHandler(superController);
 
         ChannelPipeline pipeline= Channels.pipeline();
+        pipeline.addLast("hcpmessage",new FixedLengthFrameDecoder(31));
         pipeline.addLast("hcpmessageDecoder",new HCPMessageDecoder());
         pipeline.addLast("hcpmessageEncoder",new HCPMessageEncoder());
         pipeline.addLast("idle",idleStateHandler);
