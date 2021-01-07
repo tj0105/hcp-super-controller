@@ -103,7 +103,8 @@ public class HCPSuperRouting implements HCPSuperRouteService {
         IPv4Address srcAddress=IPv4Address.of(src.toOctets());
         IPv4Address dstAddress=IPv4Address.of(dst.toOctets());
         HCPDomain  domain=superController.getHCPDomain(deviceId.toString().substring("hcp:".length()));
-        HCPForwardingReply hcpForwardingReply= HCPForwardingReplyVer10.of(srcAddress,dstAddress,
+
+        HCPForwardingReply hcpForwardingReply= HCPForwardingReplyVer10.of(HCPFlowType.HCP_HOST,srcAddress,dstAddress,
                                                                         inport,outport,Ethernet.TYPE_IPV4,(byte) 1);
 
         Set<HCPSbpFlags> flagset= new HashSet<>();
