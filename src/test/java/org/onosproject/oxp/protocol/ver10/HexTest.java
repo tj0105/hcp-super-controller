@@ -57,6 +57,7 @@ public class HexTest {
 //        System.out.println(ss);
 //        System.out.println (String.format("%06x",2222));
     }
+
     @Test
     public void longTest(){
        String s="hcp:0000000000000000001a";

@@ -167,6 +167,29 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
     }
 
     @Override
+    public HCPIOT getIoTById(HCPIOTID hcpiotid) {
+        for (Map<HCPIOTID,HCPIOT> iots: iotMap.values()){
+            for (HCPIOTID hcpiotid1: iots.keySet()){
+                if (hcpiotid1.equals(hcpiotid)){
+                    return iots.get(hcpiotid);
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public DomainId getIoTLocation(HCPIOTID hcpiotid) {
+        for (DomainId domainId: iotMap.keySet()){
+            Map<HCPIOTID,HCPIOT> map = iotMap.get(domainId);
+            if (map.get(hcpiotid) != null){
+                return domainId;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public DomainId getHostLocation(HostId hostId) {
         for (DomainId domainId:hostMap.keySet()){
             Map<HostId,HCPHost> map=hostMap.get(domainId);
@@ -426,7 +449,6 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
     // The class weigth for the graph TopologyEdge
     private class GraphEdgeWeigth extends DefaultEdgeWeigher<TopologyVertex,TopologyEdge> implements LinkWeigher{
         private static final long LINK_WEIGTH_FULL=100;
-
         /**
          * 根据不同的参数给边赋权重,如果需要采用自带的获取路径的方法,需要给边进行权重赋值
          * @param edge

@@ -2,9 +2,7 @@ package org.onosproject.api.Super;
 
 import org.onlab.packet.IpAddress;
 import org.onosproject.hcp.protocol.HCPVportDescribtion;
-import org.onosproject.hcp.types.DomainId;
-import org.onosproject.hcp.types.HCPHost;
-import org.onosproject.hcp.types.HCPInternalLink;
+import org.onosproject.hcp.types.*;
 import org.onosproject.net.*;
 import org.onosproject.net.provider.ProviderId;
 import org.onosproject.net.topology.*;
@@ -28,6 +26,10 @@ public interface HCPSuperTopoServices {
     HCPInternalLink getinternalLinkDesc(Link link);
 
     Set<HCPHost> getHostByIp(IpAddress ipAddress);
+
+    HCPIOT getIoTById(HCPIOTID hcpiotid);
+
+    DomainId getIoTLocation(HCPIOTID hcpiotid);
 
     DomainId getHostLocation(HostId hostId);
 
