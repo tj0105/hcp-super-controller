@@ -142,6 +142,11 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
     }
 
     @Override
+    public Set<HCPIOT> getIoTByDomainId(DomainId domainId) {
+        return new HashSet<>(iotMap.get(domainId).values());
+    }
+
+    @Override
     public Set<Link> getIntraDomainLink(DomainId domainId) {
         return new HashSet<>(IntraDomainLink.get(domainId));
     }

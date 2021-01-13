@@ -21,6 +21,8 @@ public interface HCPSuperTopoServices {
 
     Set<HCPHost> getHostByDomainId(DomainId domainId);
 
+    Set<HCPIOT> getIoTByDomainId(DomainId domainId);
+
     Set<Link>  getIntraDomainLink(DomainId domainId);
 
     HCPInternalLink getinternalLinkDesc(Link link);
