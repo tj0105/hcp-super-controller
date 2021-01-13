@@ -74,7 +74,7 @@ public class HCPIoTMsgTest {
         HCPIoTReply hcpIoTReply1 = (HCPIoTReply) hcpMessage;
         System.out.println(hcpIoTReply1.getDomainId());
         System.out.println("====================this is first iot=====================");
-        System.out.println(hcpIoTReply1.getIoTs().get(0).getiPv4Address());
+        System.out.println(hcpIoTReply1.getIoTs().get(0).getiPv4Address().toString());
         System.out.println(hcpIoTReply1.getIoTs().get(0).getIoTType());
         System.out.println(hcpIoTReply1.getIoTs().get(0).getHcpiotid());
         System.out.println(hcpIoTReply1.getIoTs().get(0).getHCPIoTState());

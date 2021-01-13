@@ -65,7 +65,8 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
 
     //记录hostId and Localcation
     private Map<DomainId, Map<HostId, HCPHost>> hostMap;
-
+    //IoTId and localcation
+    private Map<DomainId, Map<HCPIOTID,HCPIOT>> iotMap;
     //构造一个网络拓扑
     private volatile DefaultTopology SuperTopology=new DefaultTopology(
                         ProviderId.NONE,new DefaultGraphDescription(0L,System.currentTimeMillis(),
@@ -81,6 +82,7 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
         vportDescribtionMap = new HashMap<>();
         InterDomainLink = new HashSet<>();
         hostMap = new HashMap<>();
+        iotMap = new HashMap<>();
         vportLoadCapability = new HashMap<>();
         vportMaxCapability = new HashMap<>();
         IntraDomainLink = new HashMap<>();
@@ -98,6 +100,7 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
         vportMap.clear();
         InterDomainLink.clear();
         hostMap.clear();
+        iotMap.clear();
         vportMaxCapability.clear();
         vportLoadCapability.clear();
         IntraDomainLinkDescription.clear();
@@ -519,6 +522,12 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
 //        log.info("=============Vport========{}====", vportMap.get(domainId).toString());
     }
 
+    /**
+     * process the HCP_HOST_UPDATE and HCP_HOST_REPLY message
+     * It is mainly used to record host information reported from domain controllers.
+     * @param domainId
+     * @param hcpHosts
+     */
     private void processHostUpdateandReply(DomainId domainId, List<HCPHost> hcpHosts) {
 //        log.info("=================hcpHost=========={}", hcpHosts.size());
         Map<HostId, HCPHost> map = hostMap.get(domainId);
@@ -540,6 +549,28 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
 
     }
 
+    /**
+     *process the HCP_IOT_UPDATE and HCP_IOT_REPLY message
+     *It is mainly used to record IOT information reported from domain controllers.
+     * @param domainId
+     * @param hcpiots
+     */
+    private void processIoTUpdateandReply(DomainId domainId, List<HCPIOT> hcpiots){
+        Map<HCPIOTID,HCPIOT> map = iotMap.get(domainId);
+        if (map == null){
+            map = new HashMap<>();
+            iotMap.put(domainId,map);
+        }
+        for (HCPIOT hcpiot:hcpiots) {
+            HCPIOTID hcpiotid = hcpiot.getHcpiotid();
+            if (hcpiot.getHCPIoTState().equals(HCPIoTState.ACTIVE)){
+                map.put(hcpiotid,hcpiot);
+            }
+            else{
+                map.remove(hcpiotid);
+            }
+        }
+    }
     private void processVportStatusMessage(DomainId domainId, HCPVportStatus hcpVportStatus) {
         switch (hcpVportStatus.getReason()) {
             case ADD:
@@ -629,10 +660,22 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
             if (message.getType() == HCPType.HCP_HOST_UPDATE) {
                 HCPHostUpdate hostUpdate = (HCPHostUpdate) message;
                 processHostUpdateandReply(domainId, hostUpdate.getHosts());
+                return ;
             }
             if (message.getType() == HCPType.HCP_TOPO_REPLY) {
                 HCPTopologyReply topologyReply = (HCPTopologyReply) message;
                 processTopologyReply(domainId, topologyReply.getInternalLink());
+                return ;
+            }
+            if (message.getType() == HCPType.HCP_IOT_REPLY ){
+                HCPIoTReply hcpIoTReply = (HCPIoTReply) message;
+                processIoTUpdateandReply(domainId,hcpIoTReply.getIoTs());
+                return;
+            }
+            if (message.getType() == HCPType.HCP_IOT_UPDATE ){
+                HCPIoTUpdate hcpIoTUpdate = (HCPIoTUpdate) message;
+                processIoTUpdateandReply(domainId,hcpIoTUpdate.getIoTs());
+                return;
             }
             if (message.getType() == HCPType.HCP_SBP) {
                 HCPSbp hcpSbp = (HCPSbp) message;
