@@ -20,37 +20,38 @@ import org.slf4j.LoggerFactory;
  * @Date: 20-3-4 下午11:08
  * @Version 1.0
  */
-public class HCPSuperPiplineFactory implements ChannelPipelineFactory,ExternalResourceReleasable{
-    private final static Logger log= LoggerFactory.getLogger(HCPSuperPiplineFactory.class);
+public class HCPSuperPiplineFactory implements ChannelPipelineFactory, ExternalResourceReleasable {
+    private final static Logger log = LoggerFactory.getLogger(HCPSuperPiplineFactory.class);
 
     private HCPSuperController superController;
     protected Timer timer;
     protected IdleStateHandler idleStateHandler;
     protected ReadTimeoutHandler readTimeoutHandler;
 
-    public HCPSuperPiplineFactory(HCPSuperController superController){
+    public HCPSuperPiplineFactory(HCPSuperController superController) {
         super();
-        this.superController=superController;
-        this.timer=new HashedWheelTimer();
-        this.idleStateHandler=new IdleStateHandler(timer,20,25,0);
-        this.readTimeoutHandler=new ReadTimeoutHandler(timer,30);
+        this.superController = superController;
+        this.timer = new HashedWheelTimer();
+        this.idleStateHandler = new IdleStateHandler(timer, 20, 25, 0);
+        this.readTimeoutHandler = new ReadTimeoutHandler(timer, 30);
     }
 
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
-        HCPSuperChannelHandler handler=new HCPSuperChannelHandler(superController);
+        HCPSuperChannelHandler handler = new HCPSuperChannelHandler(superController);
 
-        ChannelPipeline pipeline= Channels.pipeline();
-        pipeline.addLast("hcpmessageDecoder",new HCPMessageDecoder());
-        pipeline.addLast("hcpmessageEncoder",new HCPMessageEncoder());
-        pipeline.addLast("idle",idleStateHandler);
-        pipeline.addLast("timeout",readTimeoutHandler);
-        pipeline.addLast("handler",handler);
+        ChannelPipeline pipeline = Channels.pipeline();
+        pipeline.addLast("hcpmessageDecoder", new HCPMessageDecoder());
+        pipeline.addLast("hcpmessageEncoder", new HCPMessageEncoder());
+        pipeline.addLast("idle", idleStateHandler);
+        pipeline.addLast("timeout", readTimeoutHandler);
+        pipeline.addLast("handler", handler);
         return pipeline;
     }
+
     @Override
-    public void releaseExternalResources(){
+    public void releaseExternalResources() {
         timer.stop();
     }
 

@@ -4,6 +4,8 @@ import org.junit.Test;
 import org.onlab.packet.IpAddress;
 import org.onosproject.net.DeviceId;
 import org.onosproject.net.Path;
+import org.onosproject.net.Port;
+import org.onosproject.net.PortNumber;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,8 +20,17 @@ import java.util.Map;
 public class HexTest {
     @Test
     public  void main() {
-        System.out.println(String.format("%016d",10));
-        System.out.println(String.format("%016x",10));
+        Map<PortNumber,Integer> map = getTestResult();
+        MyHashMap<PortNumber,Integer> myHashMap = convertToMyHashMap(map);
+        System.out.println(myHashMap.toString());
+//        Map<Integer,Map<Integer,Integer>> map = new HashMap<>();
+//        Map<Integer,Integer> map1 = new HashMap<>();
+//        map1.put(2,2);
+//        map.put(1,map1);
+////        map.put(2);
+//        System.out.println(map.get(1));
+//        System.out.println(String.format("%016d",10));
+//        System.out.println(String.format("%016x",10));
 //        Map<String,Long> hashmap=new HashMap<>();
 //        Thread thread=new Thread(){
 //            @Override
@@ -97,5 +108,35 @@ public class HexTest {
         System.out.println(integerIntegerMap.toString());
         integerIntegerMap.put("1",4);
         System.out.println(integerIntegerMap.toString());
+    }
+
+    public Map<PortNumber,Integer> getTestResult(){
+        Map<PortNumber,Integer> map = new HashMap<>();
+        PortNumber portNumber = PortNumber.portNumber(1);
+        PortNumber portNumber1 = PortNumber.portNumber(2);
+        PortNumber portNumber2 = PortNumber.portNumber(3);
+        map.put(portNumber,1);
+        map.put(portNumber1,2);
+        map.put(portNumber2,3);
+        return map;
+    }
+
+    public MyHashMap<PortNumber,Integer> convertToMyHashMap(Map<PortNumber,Integer> map){
+        MyHashMap<PortNumber,Integer> myHashMap = new MyHashMap<>();
+        for (PortNumber portNumber: map.keySet()) {
+            myHashMap.put(portNumber,map.get(portNumber));
+        }
+        return myHashMap;
+    }
+
+    class MyHashMap<K,V> extends HashMap<K, V> {
+        @Override
+        public String toString() {
+            String result = "";
+            for(Map.Entry<K,V> entry: entrySet()){
+                result += "{Vport=" + entry.getKey() + ",Hops=" + entry.getValue() + "},";
+            }
+            return result.substring(0,result.length()-1);
+        }
     }
 }

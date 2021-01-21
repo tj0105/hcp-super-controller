@@ -37,44 +37,45 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Service
 public class HCPSuperControllerImpl implements HCPSuperController {
 
-    private static final Logger log= LoggerFactory.getLogger(HCPSuperControllerImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(HCPSuperControllerImpl.class);
     //保存DomainId和每个Domain的实列
-    private Map<DomainId,HCPDomain> domainMap;
+    private Map<DomainId, HCPDomain> domainMap;
     //保存DeviceId的Device
-    private Map<DeviceId,Device> deviceMap;
+    private Map<DeviceId, Device> deviceMap;
 
     //保存每個域的Configflag
-    private Map<DomainId,Integer> domainModeFlag;
-    private Map<DomainId,Boolean> loadBlanceFlag;
-    private HCPSuperConnector connector=new HCPSuperConnector(this);
-    private HCPDomainListener domainListener=new InternalHCPDomainListener();
-    private Set<HCPDomainMessageListener> hcpDomainMessageListeners=new CopyOnWriteArraySet<>();
-    private Set<HCPDomainListener> hcpDomainListeners=new CopyOnWriteArraySet<>();
+    private Map<DomainId, Integer> domainModeFlag;
+    private Map<DomainId, Boolean> loadBlanceFlag;
+    private HCPSuperConnector connector = new HCPSuperConnector(this);
+    private HCPDomainListener domainListener = new InternalHCPDomainListener();
+    private Set<HCPDomainMessageListener> hcpDomainMessageListeners = new CopyOnWriteArraySet<>();
+    private Set<HCPDomainListener> hcpDomainListeners = new CopyOnWriteArraySet<>();
 
-    protected String HCPSuperIP="127.0.0.1";
-    protected int HCPSuperPort=8899;
+    protected String HCPSuperIP = "127.0.0.1";
+    protected int HCPSuperPort = 8899;
     private HCPVersion hcpVersion;
     private HCPFactory hcpFactory;
 
-    private HCPConfigFlags pathComputerParam=HCPConfigFlags.CAPABILITIES_BW;
-    private Boolean isLoadBlance=true;
+    private HCPConfigFlags pathComputerParam = HCPConfigFlags.CAPABILITIES_BW;
+    private Boolean isLoadBlance = true;
 
     @Activate
-    public void activate(){
+    public void activate() {
         this.setHCPVersion(HCPVersion.HCP_10);
         this.setHCPSuperPort(HCPSuperPort);
         this.setHCPSuperPort(HCPSuperPort);
-        hcpFactory=HCPFactories.getFactory(hcpVersion);
-        domainMap=new HashMap<>();
-        deviceMap=new HashMap<>();
-        domainModeFlag=new HashMap<>();
-        loadBlanceFlag=new HashMap<>();
+        hcpFactory = HCPFactories.getFactory(hcpVersion);
+        domainMap = new HashMap<>();
+        deviceMap = new HashMap<>();
+        domainModeFlag = new HashMap<>();
+        loadBlanceFlag = new HashMap<>();
         this.addHCPDomainListener(domainListener);
         connector.start();
         log.info("====================HCPSuperController Started=================");
     }
+
     @Deactivate
-    public void deactivate(){
+    public void deactivate() {
 //        log.info("Domain controller size:{} Domain Controller Channel {}",domainMap.size(),domainMap.get(DomainId.of(1111)).channleId());
         connector.stop();
         domainMap.clear();
@@ -91,7 +92,7 @@ public class HCPSuperControllerImpl implements HCPSuperController {
 
     @Override
     public void setHCPVersion(HCPVersion hcpVersion) {
-        this.hcpVersion=hcpVersion;
+        this.hcpVersion = hcpVersion;
     }
 
     @Override
@@ -101,7 +102,7 @@ public class HCPSuperControllerImpl implements HCPSuperController {
 
     @Override
     public void setHCPSuperPort(int hcpSuperPort) {
-        this.HCPSuperPort=hcpSuperPort;
+        this.HCPSuperPort = hcpSuperPort;
     }
 
     @Override
@@ -111,7 +112,7 @@ public class HCPSuperControllerImpl implements HCPSuperController {
 
     @Override
     public void setHCPSuperIp(String hcpSuperIp) {
-        this.HCPSuperIP=hcpSuperIp;
+        this.HCPSuperIP = hcpSuperIp;
     }
 
     @Override
@@ -136,47 +137,47 @@ public class HCPSuperControllerImpl implements HCPSuperController {
 
     @Override
     public void sendHCPMessge(DomainId domainId, HCPMessage message) {
-        HCPDomain domain=getHCPDomain(domainId);
-        if (null!=domain && domain.isConnected()){
+        HCPDomain domain = getHCPDomain(domainId);
+        if (null != domain && domain.isConnected()) {
             domain.sendMsg(message);
         }
     }
 
     @Override
     public void addDomain(DomainId domainId, HCPDomain domain) {
-        domainMap.put(domainId,domain);
-        DeviceId deviceId=domain.getDeviceId();
-        Device device=new DefaultDevice(ProviderId.NONE,deviceId,Device.Type.CONTROLLER
-                            ,"USTC","1.0","Domain Controller","1",new ChassisId(domain.getDomainId().getLong()));
-        deviceMap.put(deviceId,device);
-        for (HCPDomainListener listener:hcpDomainListeners){
+        domainMap.put(domainId, domain);
+        DeviceId deviceId = domain.getDeviceId();
+        Device device = new DefaultDevice(ProviderId.NONE, deviceId, Device.Type.CONTROLLER
+                , "USTC", "1.0", "Domain Controller", "1", new ChassisId(domain.getDomainId().getLong()));
+        deviceMap.put(deviceId, device);
+        for (HCPDomainListener listener : hcpDomainListeners) {
             listener.domainConnected(domain);
         }
     }
 
     @Override
     public void removeDomain(DomainId domainId) {
-        HCPDomain hcpDomain=getHCPDomain(domainId);
-        if (null!=hcpDomain){
+        HCPDomain hcpDomain = getHCPDomain(domainId);
+        if (null != hcpDomain) {
             deviceMap.remove(hcpDomain.getDeviceId());
             domainMap.remove(domainId);
-            for (HCPDomainListener listener: hcpDomainListeners){
+            for (HCPDomainListener listener : hcpDomainListeners) {
                 listener.domainDisConnected(hcpDomain);
             }
         }
     }
 
     @Override
-    public void processDownstremMessage(DomainId domainId,List<HCPMessage> messages) {
-        for (HCPDomainMessageListener messageListener:hcpDomainMessageListeners){
-            messageListener.hanldeOutGoingMessage(domainId,messages);
+    public void processDownstremMessage(DomainId domainId, List<HCPMessage> messages) {
+        for (HCPDomainMessageListener messageListener : hcpDomainMessageListeners) {
+            messageListener.hanldeOutGoingMessage(domainId, messages);
         }
     }
 
     @Override
-    public void processMessage(DomainId domainId,HCPMessage message) {
-        for (HCPDomainMessageListener listener:hcpDomainMessageListeners){
-            listener.handleIncomingMessaget(domainId,message);
+    public void processMessage(DomainId domainId, HCPMessage message) {
+        for (HCPDomainMessageListener listener : hcpDomainMessageListeners) {
+            listener.handleIncomingMessaget(domainId, message);
         }
     }
 
@@ -187,22 +188,24 @@ public class HCPSuperControllerImpl implements HCPSuperController {
 
     @Override
     public HCPDomain getHCPDomain(String domainId) {
-        for (DomainId domainId1:domainMap.keySet()){
-            if (domainId1.toString().equals(domainId)){
+        for (DomainId domainId1 : domainMap.keySet()) {
+            if (domainId1.toString().equals(domainId)) {
                 return domainMap.get(domainId1);
             }
         }
         return null;
     }
+
     @Override
     public HCPDomain getHCPDomain(long domainId) {
-        for (DomainId domainId1:domainMap.keySet()){
-            if (domainId1.getLong()==domainId){
+        for (DomainId domainId1 : domainMap.keySet()) {
+            if (domainId1.getLong() == domainId) {
                 return domainMap.get(domainId1);
             }
         }
         return null;
     }
+
     @Override
     public Set<HCPDomain> getDomains() {
         return ImmutableSet.copyOf(domainMap.values());
@@ -240,49 +243,47 @@ public class HCPSuperControllerImpl implements HCPSuperController {
         return pathComputerParam;
     }
 
-    private class InternalHCPDomainListener implements HCPDomainListener{
+    private class InternalHCPDomainListener implements HCPDomainListener {
 
         @Override
         public void domainConnected(HCPDomain domain) {
-                DomainId domainId=domain.getDomainId();
-                int flag=0;
-                if (domain.isAdvanceFlag()){
-                    loadBlanceFlag.put(domainId,true);
-                }else{
-                    isLoadBlance=false;
-                    loadBlanceFlag.put(domainId,false);
-                }
-                if (domain.isBandWidthFlag()){
-                    flag|=1<<0;
-                }
-                else if (domain.isDelayFlag()){
-                    flag|=1<<1;
-                }
-                else if (domain.isHopFlag()){
-                    flag|=1<<2;
-                }
-                domainModeFlag.put(domainId,flag);
-                if (getDomains().size()!=1){
-                    return ;
-                }
-                switch (flag){
-                    case 1:
-                        pathComputerParam=HCPConfigFlags.CAPABILITIES_BW;
-                        break;
-                    case 2:
-                        pathComputerParam=HCPConfigFlags.CAPABILITIES_DELAY;
-                        break;
-                    case 4:
-                        pathComputerParam=HCPConfigFlags.CAPABILITIES_HOP;
-                        break;
-                }
+            DomainId domainId = domain.getDomainId();
+            int flag = 0;
+            if (domain.isAdvanceFlag()) {
+                loadBlanceFlag.put(domainId, true);
+            } else {
+                isLoadBlance = false;
+                loadBlanceFlag.put(domainId, false);
+            }
+            if (domain.isBandWidthFlag()) {
+                flag |= 1 << 0;
+            } else if (domain.isDelayFlag()) {
+                flag |= 1 << 1;
+            } else if (domain.isHopFlag()) {
+                flag |= 1 << 2;
+            }
+            domainModeFlag.put(domainId, flag);
+            if (getDomains().size() != 1) {
+                return;
+            }
+            switch (flag) {
+                case 1:
+                    pathComputerParam = HCPConfigFlags.CAPABILITIES_BW;
+                    break;
+                case 2:
+                    pathComputerParam = HCPConfigFlags.CAPABILITIES_DELAY;
+                    break;
+                case 4:
+                    pathComputerParam = HCPConfigFlags.CAPABILITIES_HOP;
+                    break;
+            }
 
         }
 
         @Override
         public void domainDisConnected(HCPDomain domain) {
-                domainModeFlag.remove(domain.getDomainId());
-                loadBlanceFlag.remove(domain.getDomainId());
+            domainModeFlag.remove(domain.getDomainId());
+            loadBlanceFlag.remove(domain.getDomainId());
         }
     }
 }

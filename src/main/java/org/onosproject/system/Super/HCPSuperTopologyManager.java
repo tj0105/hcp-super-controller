@@ -57,8 +57,8 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
 
     //记录域间link
     private Set<Link> InterDomainLink;
-    public  static ProviderId interDomainLinkProviderId = ProviderId.NONE;
-    public  static ProviderId RouteproviderId=new ProviderId("USTC","HCP");
+    public static ProviderId interDomainLinkProviderId = ProviderId.NONE;
+    public static ProviderId RouteproviderId = new ProviderId("USTC", "HCP");
     //记录域内link
     private Map<DomainId, Set<Link>> IntraDomainLink;
     private Map<Link, HCPInternalLink> IntraDomainLinkDescription;
@@ -67,14 +67,15 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
     private Map<DomainId, Map<HostId, HCPHost>> hostMap;
 
     //构造一个网络拓扑
-    private volatile DefaultTopology SuperTopology=new DefaultTopology(
-                        ProviderId.NONE,new DefaultGraphDescription(0L,System.currentTimeMillis(),
-                                     Collections.<Device>emptyList(),Collections.<Link>emptyList()));
-    private LinkWeigher linkWeigherTool=null;
-    private final LinkWeigher linkWeigherHopTool=new GraphEdgeWeigth();
+    private volatile DefaultTopology SuperTopology = new DefaultTopology(
+            ProviderId.NONE, new DefaultGraphDescription(0L, System.currentTimeMillis(),
+            Collections.<Device>emptyList(), Collections.<Link>emptyList()));
+    private LinkWeigher linkWeigherTool = null;
+    private final LinkWeigher linkWeigherHopTool = new GraphEdgeWeigth();
 
 
     final double MEASURE_TOLERANCE = 0.05;
+
     @Activate
     public void activate() {
         vportMap = new HashMap<>();
@@ -150,11 +151,11 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
 
     @Override
     public Set<HCPHost> getHostByIp(IpAddress ipAddress) {
-        IPv4Address iPv4Address=IPv4Address.of(ipAddress.toOctets());
-        Set<HCPHost> hcpHosts=new HashSet<>();
-        for (Map<HostId,HCPHost> hosts:hostMap.values()){
-            for (HCPHost hcpHost:hosts.values()){
-                if (hcpHost.getiPv4Address().equals(iPv4Address)){
+        IPv4Address iPv4Address = IPv4Address.of(ipAddress.toOctets());
+        Set<HCPHost> hcpHosts = new HashSet<>();
+        for (Map<HostId, HCPHost> hosts : hostMap.values()) {
+            for (HCPHost hcpHost : hosts.values()) {
+                if (hcpHost.getiPv4Address().equals(iPv4Address)) {
                     hcpHosts.add(hcpHost);
                 }
             }
@@ -165,9 +166,9 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
 
     @Override
     public DomainId getHostLocation(HostId hostId) {
-        for (DomainId domainId:hostMap.keySet()){
-            Map<HostId,HCPHost> map=hostMap.get(domainId);
-            if (map.get(hostId)!=null){
+        for (DomainId domainId : hostMap.keySet()) {
+            Map<HostId, HCPHost> map = hostMap.get(domainId);
+            if (map.get(hostId) != null) {
                 return domainId;
             }
         }
@@ -190,56 +191,56 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
 
     @Override
     public long getVportRestCapability(ConnectPoint connectPoint) {
-        long load=vportLoadCapability.get(connectPoint);
-        long max=vportMaxCapability.get(connectPoint);
-        if (load!=-1&&max!=-1)
-            return max-load;
+        long load = vportLoadCapability.get(connectPoint);
+        long max = vportMaxCapability.get(connectPoint);
+        if (load != -1 && max != -1)
+            return max - load;
         return -1;
     }
 
     @Override
     public long getInterLinkDelayCapability(Link link) {
         Preconditions.checkNotNull(link);
-        long srcVPortDelayCapablity =getVportRestCapability(link.src());
-        long dstVportDelayCapablity =getVportRestCapability(link.dst());
-        return Long.max(srcVPortDelayCapablity,dstVportDelayCapablity);
+        long srcVPortDelayCapablity = getVportRestCapability(link.src());
+        long dstVportDelayCapablity = getVportRestCapability(link.dst());
+        return Long.max(srcVPortDelayCapablity, dstVportDelayCapablity);
     }
 
     @Override
     public long getInterLinkRestBandwidthCapability(Link link) {
         Preconditions.checkNotNull(link);
 //        long srcVPortDelayCapablity =getVportRestCapability(link.src());
-        long dstVportRestCapablity =getVportRestCapability(link.dst());
+        long dstVportRestCapablity = getVportRestCapability(link.dst());
         return dstVportRestCapablity;
     }
 
     @Override
-    public  Set<TopologyVertex> getTopologyVertx(){
-        if (SuperTopology.deviceCount()!=0){
+    public Set<TopologyVertex> getTopologyVertx() {
+        if (SuperTopology.deviceCount() != 0) {
             return SuperTopology.getGraph().getVertexes();
         }
         return null;
     }
 
     @Override
-    public  Set<TopologyEdge> getTopologyEdge(TopologyVertex topologyVertex){
+    public Set<TopologyEdge> getTopologyEdge(TopologyVertex topologyVertex) {
         return SuperTopology.getGraph().getEdgesFrom(topologyVertex);
     }
 
     @Override
     public Set<Path> getLoadBlancePath(ElementId src, ElementId dst, Topology topology) {
-        return LoadBlancePaths(src,dst,topology,null);
+        return LoadBlancePaths(src, dst, topology, null);
 
     }
 
     @Override
     public Set<Path> getLoadBlancePath(ElementId src, ElementId dst, Topology topology, LinkWeigher weigher) {
-        return LoadBlancePaths(src,dst,topology,weigher);
+        return LoadBlancePaths(src, dst, topology, weigher);
     }
 
     @Override
     public Set<Path> getLoadBlancePath(ElementId src, ElementId dst) {
-        return getLoadBlancePath(src,dst,SuperTopology);
+        return getLoadBlancePath(src, dst, SuperTopology);
     }
 
     @Override
@@ -249,37 +250,40 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
 
     /**
      * 获取跳数最少的路径
+     *
      * @param pathList
      * @return
      */
-    private Path getMinHopPath(List<Path> pathList){
-        Path result=pathList.get(0);
-        for (int i = 1; i <pathList.size(); i++) {
-            Path temp=pathList.get(i);
-            result=result.links().size()>temp.links().size() ? temp:result;
+    private Path getMinHopPath(List<Path> pathList) {
+        Path result = pathList.get(0);
+        for (int i = 1; i < pathList.size(); i++) {
+            Path temp = pathList.get(i);
+            result = result.links().size() > temp.links().size() ? temp : result;
         }
         return result;
     }
+
     /**
      * 计算符合负载均衡的路径
-     * @param src 表示host所在的源域
-     * @param dst 表示host所在的目的域
+     *
+     * @param src      表示host所在的源域
+     * @param dst      表示host所在的目的域
      * @param topology 由域间链路生成的拓扑
-     * @param weigher   链路的权重
+     * @param weigher  链路的权重
      * @return
      */
-    private Set<Path> LoadBlancePaths(ElementId src,ElementId dst,Topology topology,LinkWeigher weigher) {
+    private Set<Path> LoadBlancePaths(ElementId src, ElementId dst, Topology topology, LinkWeigher weigher) {
         linkWeigherTool = weigher == null ? new GraphEdgeWeigth() : weigher;
         if (src instanceof DeviceId && dst instanceof DeviceId) {
-            Set<List<TopologyEdge>> allPaths =BFSFindAllPath(new DefaultTopologyVertex((DeviceId)src),
-                                                             new DefaultTopologyVertex((DeviceId)dst),
-                                                             ((DefaultTopology)topology).getGraph());
+            Set<List<TopologyEdge>> allPaths = BFSFindAllPath(new DefaultTopologyVertex((DeviceId) src),
+                    new DefaultTopologyVertex((DeviceId) dst),
+                    ((DefaultTopology) topology).getGraph());
             Set<Path> pathSet = CalculatePathCost(allPaths);
-            if (superController.getPathComputerParam().equals(HCPConfigFlags.CAPABILITIES_HOP)){
+            if (superController.getPathComputerParam().equals(HCPConfigFlags.CAPABILITIES_HOP)) {
                 return pathSet;
             }
-            Path path=selectPath(pathSet);
-            return path!=null ? ImmutableSet.of(path):ImmutableSet.of();
+            Path path = selectPath(pathSet);
+            return path != null ? ImmutableSet.of(path) : ImmutableSet.of();
         }
         return ImmutableSet.of();
     }
@@ -289,16 +293,20 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
      * @param paths
      * @return
      */
-    private  Path selectPath(Set<Path> paths){
-        if (paths.size()<1){
+    private Path selectPath(Set<Path> paths) {
+        if (paths.size() < 1) {
             return null;
         }
-        return getMinCostPath(new ArrayList(paths) );
+        return getMinCostPath(new ArrayList(paths));
     }
 
     /**
-     * 通过比较各条路径的带宽权值，从中选出一组具有较小权值的路径，作为优选路由路径。这
-     * 组路径中至少有一条路径的权值为所有可选路由路径的权值中的最小值
+     * 由路径
+     * By comparing the bandwidth weights of each path, a group of paths with a smaller
+     * weight are selected as the preferred routing path. The weight of at least one
+     * path in this group ofpaths is the smallest value among the weights of all alternative
+     * routing paths的权.中的最小值
+     *
      * @param pathList
      * @return
      */
@@ -321,95 +329,103 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
     }
 
     /**
-     * 获取每条路径的权重，首先，计算路径上的每一条链路的权值,其次，选择路径上所有链路的权值的最大值，作为该路径的带宽权值
-     * 因为各条链路的负载不同，根据木桶效应，具有最大负载的链路将成为整条路径的短板.
+     * Obtain the weight of each path. First, calculate the weight of each link on the path.
+     * Second, select the maximum value of the weight of all links on the path as the bandwidth
+     * weight of the path. The load is different. According to the barrel effect,the link with
+     * the largest load will become the short board of the entire path.
+     *
      * @param pathSet
      * @return
      */
-    private Set<Path> CalculatePathCost(Set<List<TopologyEdge>> pathSet){
-        Set<Path> allResult=new HashSet<>();
-        pathSet.forEach(path->{
-            ScalarWeight weight=(ScalarWeight) maxPathWeight(path);
-            allResult.add(parseEdgetoLink(path,weight));
+    private Set<Path> CalculatePathCost(Set<List<TopologyEdge>> pathSet) {
+        Set<Path> allResult = new HashSet<>();
+        pathSet.forEach(path -> {
+            ScalarWeight weight = (ScalarWeight) maxPathWeight(path);
+            allResult.add(parseEdgetoLink(path, weight));
         });
 
         return allResult;
     }
 
     /**
-     *  如果是带宽:计算路径上的每一条链路的权值,选择路径上所有链路的权值的最大值
-     *  如果是Hop:计算路径上的每一条链路的权值之和
+     * If bandwidth: calculate the weight of each link on the path,
+     * select the maximum weight of all links on the path
+     * If Hop: compute the sum of the weights of each link on the path.
+     *
      * @param edgeList
      * @return
      */
-    private Weight maxPathWeight(List<TopologyEdge> edgeList){
-        double weight=0;
-       if (superController.getPathComputerParam().equals(HCPConfigFlags.CAPABILITIES_HOP)
-               ||superController.getPathComputerParam().equals(HCPConfigFlags.CAPABILITIES_DELAY)){
-            for (TopologyEdge edge:edgeList){
-                weight+=((ScalarWeight)linkWeigherTool.weight(edge)).value();
+    private Weight maxPathWeight(List<TopologyEdge> edgeList) {
+        double weight = 0;
+        if (superController.getPathComputerParam().equals(HCPConfigFlags.CAPABILITIES_HOP)
+                || superController.getPathComputerParam().equals(HCPConfigFlags.CAPABILITIES_DELAY)) {
+            for (TopologyEdge edge : edgeList) {
+                weight += ((ScalarWeight) linkWeigherTool.weight(edge)).value();
             }
             return new ScalarWeight(weight);
         } else {
-            for (TopologyEdge edge:edgeList){
-                ScalarWeight scalarWeight=(ScalarWeight) linkWeigherTool.weight(edge);
-                double linkWeight=scalarWeight.value();
-                weight=Double.max(weight,linkWeight);
+            for (TopologyEdge edge : edgeList) {
+                ScalarWeight scalarWeight = (ScalarWeight) linkWeigherTool.weight(edge);
+                double linkWeight = scalarWeight.value();
+                weight = Double.max(weight, linkWeight);
             }
             return new ScalarWeight(weight);
         }
     }
 
     /**
-     * 将每条路径的Edge属性改成link，并添加Cost属性
+     * Change the Edge attribute to link for each path, and add the Cost attribute
+     *
      * @param edgeList
      * @param cost
      * @return
      */
-    private Path parseEdgetoLink(List<TopologyEdge> edgeList,ScalarWeight cost){
-        List<Link> links=new ArrayList<>();
+    private Path parseEdgetoLink(List<TopologyEdge> edgeList, ScalarWeight cost) {
+        List<Link> links = new ArrayList<>();
         edgeList.forEach(edge -> {
             links.add(edge.link());
         });
-        return new DefaultPath(RouteproviderId,links,cost);
+        return new DefaultPath(RouteproviderId, links, cost);
     }
-    /***
-     * 获取从源到目的节点的所有路径
+
+    /**
+     * Calculate all paths between SRC and DST through BFS获取从源的节点的所有路径
+     *
      * @param src
      * @param dst
      * @param graph
      * @return
      */
-    private Set<List<TopologyEdge>> BFSFindAllPath(TopologyVertex src,TopologyVertex dst,TopologyGraph graph){
-        if (src.equals(dst)){
+    private Set<List<TopologyEdge>> BFSFindAllPath(TopologyVertex src, TopologyVertex dst, TopologyGraph graph) {
+        if (src.equals(dst)) {
             return null;
         }
-        Queue<List<TopologyEdge>> path=new LinkedList<>();
-        Set<List<TopologyEdge>> result=new HashSet<>();
+        Queue<List<TopologyEdge>> path = new LinkedList<>();
+        Set<List<TopologyEdge>> result = new HashSet<>();
         List<TopologyEdge> list;
-        Iterator<TopologyEdge> iterator=graph.getEdgesFrom(src).iterator();
-        while(iterator.hasNext()){
-            list=new ArrayList<>();
+        Iterator<TopologyEdge> iterator = graph.getEdgesFrom(src).iterator();
+        while (iterator.hasNext()) {
+            list = new ArrayList<>();
             list.add(iterator.next());
             path.add(list);
         }
-        while(!path.isEmpty()){
-            List<TopologyEdge> edgeList=path.poll();
-            TopologyEdge edge=edgeList.get(edgeList.size()-1);
-            TopologyVertex vertex=edge.dst();
-            if (edge.dst().equals(dst)){
+        while (!path.isEmpty()) {
+            List<TopologyEdge> edgeList = path.poll();
+            TopologyEdge edge = edgeList.get(edgeList.size() - 1);
+            TopologyVertex vertex = edge.dst();
+            if (edge.dst().equals(dst)) {
                 result.add(ImmutableList.copyOf(edgeList));
                 continue;
             }
-            Iterator<TopologyEdge> iterator1=graph.getEdgesFrom(vertex).iterator();
-            while(iterator1.hasNext()){
-                List<TopologyEdge> edgeList1=new ArrayList<>(edgeList);
-                TopologyEdge edge1=iterator1.next();
-                TopologyVertex vertex1=edge1.dst();
+            Iterator<TopologyEdge> iterator1 = graph.getEdgesFrom(vertex).iterator();
+            while (iterator1.hasNext()) {
+                List<TopologyEdge> edgeList1 = new ArrayList<>(edgeList);
+                TopologyEdge edge1 = iterator1.next();
+                TopologyVertex vertex1 = edge1.dst();
                 edgeList1.add(edge1);
                 path.add(edgeList1);
-                for (TopologyEdge topologyEdge:edgeList1){
-                    if (topologyEdge.src().equals(vertex1)){
+                for (TopologyEdge topologyEdge : edgeList1) {
+                    if (topologyEdge.src().equals(vertex1)) {
                         path.remove(edgeList1);
                         break;
                     }
@@ -420,41 +436,43 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
         return result;
 
     }
+
     // The class weigth for the graph TopologyEdge
-    private class GraphEdgeWeigth extends DefaultEdgeWeigher<TopologyVertex,TopologyEdge> implements LinkWeigher{
-        private static final long LINK_WEIGTH_FULL=100;
+    private class GraphEdgeWeigth extends DefaultEdgeWeigher<TopologyVertex, TopologyEdge> implements LinkWeigher {
+        private static final long LINK_WEIGTH_FULL = 100;
 
         /**
-         * 根据不同的参数给边赋权重,如果需要采用自带的获取路径的方法,需要给边进行权重赋值
+         * LinkWeigth, 赋值
+         * Depending on different paramenters, there are mainly Hop,Delay, and Bandwidth
+         *
          * @param edge
          * @return
          */
         @Override
         public Weight weight(TopologyEdge edge) {
-            if (superController.getPathComputerParam().equals(HCPConfigFlags.CAPABILITIES_HOP)){
-                long linkRest=getInterLinkRestBandwidthCapability(edge.link());
-                if (linkRest>2){
+            if (superController.getPathComputerParam().equals(HCPConfigFlags.CAPABILITIES_HOP)) {
+                long linkRest = getInterLinkRestBandwidthCapability(edge.link());
+                if (linkRest > 2) {
                     return new ScalarWeight(1);
-                }
-                else{
+                } else {
                     return new ScalarWeight(1000);
                 }
-            }else if (superController.getPathComputerParam().equals(HCPConfigFlags.CAPABILITIES_DELAY)){
+            } else if (superController.getPathComputerParam().equals(HCPConfigFlags.CAPABILITIES_DELAY)) {
                 return new ScalarWeight(getInterLinkDelayCapability(edge.link()));
-            }
-            else{
-                long linkSpeed=getLinkBandWidth(edge.link());
-                long linkRest =getInterLinkRestBandwidthCapability(edge.link());
-                if (linkRest<=0){
+            } else {
+                long linkSpeed = getLinkBandWidth(edge.link());
+                long linkRest = getInterLinkRestBandwidthCapability(edge.link());
+                if (linkRest <= 0) {
                     return new ScalarWeight(LINK_WEIGTH_FULL);
                 }
-                return new ScalarWeight( 10- linkRest*1.0/linkSpeed*100);
+                return new ScalarWeight(10 - linkRest * 1.0 / linkSpeed * 100);
             }
         }
-        public long getLinkBandWidth(Link link){
-            long BandWidth=getVportMaxCapability(link.dst());
+
+        public long getLinkBandWidth(Link link) {
+            long BandWidth = getVportMaxCapability(link.dst());
 //            long dstBandWidth=getVportMaxCapability(link.dst());
-            if (BandWidth!=-1){
+            if (BandWidth != -1) {
                 return BandWidth;
             }
             return -1;
@@ -462,21 +480,30 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
 
     }
 
-
-    synchronized private void UpdateTopology(){
-        GraphDescription graphDescription=new DefaultGraphDescription(System.nanoTime(),System.currentTimeMillis()
-        ,superController.getDevices(),getInterDomainLink());
-        DefaultTopology defaultTopology=new DefaultTopology(ProviderId.NONE,graphDescription);
-        SuperTopology=defaultTopology;
+    /**
+     * The Topology is a global abstract topology constructed by receiving
+     * abstract topology information for each domain controller.
+     */
+    synchronized private void UpdateTopology() {
+        GraphDescription graphDescription = new DefaultGraphDescription(System.nanoTime(), System.currentTimeMillis()
+                , superController.getDevices(), getInterDomainLink());
+        DefaultTopology defaultTopology = new DefaultTopology(ProviderId.NONE, graphDescription);
+        SuperTopology = defaultTopology;
 
 
     }
 
-
+    /**
+     * When the Vport is to be deleted, the associated links and other information
+     * about the Vport need to be deleted as well.
+     *
+     * @param domainId
+     * @param hcpVportDescribtion
+     */
     private void removeVport(DomainId domainId, HCPVportDescribtion hcpVportDescribtion) {
         PortNumber vportNumber = PortNumber.portNumber(hcpVportDescribtion.getPortNo().getPortNumber());
         DeviceId deviceId = getDeviceId(domainId);
-        ConnectPoint connectPoint=new ConnectPoint(deviceId,vportNumber);
+        ConnectPoint connectPoint = new ConnectPoint(deviceId, vportNumber);
         Set<PortNumber> vportSet = vportMap.get(domainId);
         if (vportSet != null) {
             vportSet.remove(vportNumber);
@@ -495,11 +522,18 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
         for (Link link : removeLink) {
             InterDomainLink.remove(link);
         }
-        if (!removeLink.isEmpty()){
+        if (!removeLink.isEmpty()) {
             UpdateTopology();
         }
     }
 
+    /**
+     * When the domain controller finds a boundary node and assigns it a Vport,
+     * it needs to notify the SuperController and recoded it.
+     *
+     * @param domainId         DomainId represents the Domain Controller ID
+     * @param Vportdescribtion
+     */
     private void addOrUpdateVport(DomainId domainId, HCPVportDescribtion Vportdescribtion) {
         Set<PortNumber> vportSet = vportMap.get(domainId);
         if (vportSet == null) {
@@ -519,27 +553,40 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
 //        log.info("=============Vport========{}====", vportMap.get(domainId).toString());
     }
 
+    /**
+     * Process HCP_HOST_UPDATE and HCP_HOST_REPLY message
+     * Get the Host information for each domain controller.
+     *
+     * @param domainId
+     * @param hcpHosts
+     */
     private void processHostUpdateandReply(DomainId domainId, List<HCPHost> hcpHosts) {
 //        log.info("=================hcpHost=========={}", hcpHosts.size());
         Map<HostId, HCPHost> map = hostMap.get(domainId);
-        if (map==null) {
+        if (map == null) {
             map = new HashMap<>();
             hostMap.put(domainId, map);
         }
-        for (HCPHost hcpHost:hcpHosts){
-            HostId hostId=HostId.hostId(MacAddress.valueOf(hcpHost.getMacAddress().getLong()));
-            if (hcpHost.getHostState().equals(HCPHostState.ACTIVE)){
-                map.put(hostId,hcpHost);
-            }else{
+        for (HCPHost hcpHost : hcpHosts) {
+            HostId hostId = HostId.hostId(MacAddress.valueOf(hcpHost.getMacAddress().getLong()));
+            if (hcpHost.getHostState().equals(HCPHostState.ACTIVE)) {
+                map.put(hostId, hcpHost);
+            } else {
 //                log.info("1111111111111111111111111111111111111111111111");
                 map.remove(hostId);
             }
         }
-        Set<HCPHost> hosts=getHostByDomainId(domainId);
+//        Set<HCPHost> hosts=getHostByDomainId(domainId);
 //        log.info("===================Host======={}=======",hosts.size());
 
     }
 
+    /***
+     * Process the VportStatus message
+     * According the status of the VPort, it can be divided into three types: ADD,MODIFY,DELETE.
+     * @param domainId
+     * @param hcpVportStatus
+     */
     private void processVportStatusMessage(DomainId domainId, HCPVportStatus hcpVportStatus) {
         switch (hcpVportStatus.getReason()) {
             case ADD:
@@ -556,6 +603,14 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
         }
     }
 
+    /**
+     * Process the TopologyReply message
+     * The contents of TopologyReply message mainly include the LoadStatus(Bandwidth) and MaxBandwidth
+     * of the VPort. It also have the number of the hops for the shortest path between the two Vports.
+     *
+     * @param domainId
+     * @param internalLinkList
+     */
     private void processTopologyReply(DomainId domainId, List<HCPInternalLink> internalLinkList) {
         Set<Link> linkSet = new HashSet<>();
         DeviceId deviceId = getDeviceId(domainId);
@@ -585,6 +640,16 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
         IntraDomainLink.put(domainId, linkSet);
     }
 
+    /**
+     * Process the HCP SBP Message
+     * The inter-domain link information is encapsulated in  the HCP SBP's PacketIn message
+     * and send to the SuperController which parses it to get link information about the
+     * inter-domain link.
+     *
+     * @param domainId
+     * @param ethernet
+     * @param portNumber
+     */
     private void processHCPLLDP(DomainId domainId, Ethernet ethernet, PortNumber portNumber) {
         HCPLLDP hcplldp = HCPLLDP.parseHCPLLDP(ethernet);
         if (null == hcplldp) {
@@ -682,7 +747,7 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
                     InterDomainLink.remove(link);
                 }
             }
-            for (Link link:getIntraDomainLink(domain.getDomainId())){
+            for (Link link : getIntraDomainLink(domain.getDomainId())) {
                 IntraDomainLinkDescription.remove(link);
             }
             IntraDomainLink.remove(domain.getDomainId());

@@ -24,50 +24,50 @@ import static org.onlab.util.Tools.timeAgo;
  * @Version 1.0
  */
 public class HCPSuperConnector {
-    public final static Logger log= LoggerFactory.getLogger(HCPSuperConnector.class);
+    public final static Logger log = LoggerFactory.getLogger(HCPSuperConnector.class);
 
     private HCPSuperController superController;
 
     private NioServerSocketChannelFactory execfactory;
-    protected static final int SEND_BUFFER_SIZE=4*1024*1024;
+    protected static final int SEND_BUFFER_SIZE = 4 * 1024 * 1024;
     protected long systemStartTime;
     private ChannelGroup channelGroup;
-    protected int workerThreads=16;
+    protected int workerThreads = 16;
 
-    public HCPSuperConnector(HCPSuperController superController){
-        this.superController=superController;
+    public HCPSuperConnector(HCPSuperController superController) {
+        this.superController = superController;
     }
 
-    public void init(){
-        this.systemStartTime=System.currentTimeMillis();
+    public void init() {
+        this.systemStartTime = System.currentTimeMillis();
     }
 
-    public void run(){
-        try{
-            final ServerBootstrap bootstrap=createServerBootStrap();
-            bootstrap.setOption("reuseAddr",true);
-            bootstrap.setOption("child.keepAlive",true);
-            bootstrap.setOption("child.tcpNoDelay",true);
-            bootstrap.setOption("child.sendBufferSize",SEND_BUFFER_SIZE);
+    public void run() {
+        try {
+            final ServerBootstrap bootstrap = createServerBootStrap();
+            bootstrap.setOption("reuseAddr", true);
+            bootstrap.setOption("child.keepAlive", true);
+            bootstrap.setOption("child.tcpNoDelay", true);
+            bootstrap.setOption("child.sendBufferSize", SEND_BUFFER_SIZE);
 
-            ChannelPipelineFactory pipelineFactory=new HCPSuperPiplineFactory(this.superController);
+            ChannelPipelineFactory pipelineFactory = new HCPSuperPiplineFactory(this.superController);
             bootstrap.setPipelineFactory(pipelineFactory);
-            channelGroup=new DefaultChannelGroup();
-            InetSocketAddress socketAddress=new InetSocketAddress(superController.getHCPSuperPort());
+            channelGroup = new DefaultChannelGroup();
+            InetSocketAddress socketAddress = new InetSocketAddress(superController.getHCPSuperPort());
             channelGroup.add(bootstrap.bind(socketAddress));
-            log.info("HCPSuperController Online,Listener for domain connections on {}",socketAddress);
-        }catch (Exception e){
+            log.info("HCPSuperController Online,Listener for domain connections on {}", socketAddress);
+        } catch (Exception e) {
             throw new RuntimeException();
         }
     }
 
-    private ServerBootstrap createServerBootStrap(){
-        if (workerThreads==0){
-            execfactory=new NioServerSocketChannelFactory(
-                    Executors.newCachedThreadPool(groupedThreads("onos/hcp","boss-%d",log)),
-                    Executors.newCachedThreadPool(groupedThreads("onos/hcp","worker-%d",log)));
+    private ServerBootstrap createServerBootStrap() {
+        if (workerThreads == 0) {
+            execfactory = new NioServerSocketChannelFactory(
+                    Executors.newCachedThreadPool(groupedThreads("onos/hcp", "boss-%d", log)),
+                    Executors.newCachedThreadPool(groupedThreads("onos/hcp", "worker-%d", log)));
             return new ServerBootstrap(execfactory);
-        }else{
+        } else {
             execfactory = new NioServerSocketChannelFactory(
                     Executors.newCachedThreadPool(groupedThreads("onos/hcp", "boss-%d", log)),
                     Executors.newCachedThreadPool(groupedThreads("onos/hcp", "worker-%d", log)), workerThreads);
@@ -75,12 +75,12 @@ public class HCPSuperConnector {
         }
     }
 
-    public void start(){
+    public void start() {
         init();
         run();
     }
 
-    public void stop(){
+    public void stop() {
         log.info("Stopping HCPSuperController ");
         channelGroup.close();
         execfactory.shutdown();
