@@ -107,7 +107,15 @@ public class HCPSuperRouting implements HCPSuperRouteService {
         }
     }
 
-
+    /**
+     * ForwardingReply Message
+     * The processed inter-domain path information is sent to each corresponding domain controller.
+     * @param deviceId
+     * @param src
+     * @param dst
+     * @param inport
+     * @param outport
+     */
     private void sendForwardingReplyToDomain(DeviceId deviceId, IpAddress src, IpAddress dst, HCPVport inport, HCPVport outport) {
         log.info("===================sendForwardingReplyToDomain=============inport=={}====output==={}", inport.toString(), outport.toString());
         IPv4Address srcAddress = IPv4Address.of(src.toOctets());
@@ -247,12 +255,19 @@ public class HCPSuperRouting implements HCPSuperRouteService {
             }
 //            log.info("========================ssssssssssssssssssssssssss============================");
             sendForwardingReplyToDomain(link.src().deviceId(), srcAddress, targetAddress,
-                    HCPVport.ofShort((short) former.dst().port().toLong()), HCPVport.ofShort((short) link.src().port().toLong()));
+                    HCPVport.ofShort((short) former.dst().port().toLong()), HCPVport.ofShort((short) link.  src().port().toLong()));
             former = link;
         }
         log.info("===========path={}", path.toString());
     }
 
+    /**
+     * Select the most suitable path according to the set link weight.
+     * @param pathSet
+     * @param srcVportHops
+     * @param dstVportHops
+     * @return
+     */
     private Path selectPath(Set<Path> pathSet, Map<PortNumber, Integer> srcVportHops, Map<PortNumber, Integer> dstVportHops) {
         List<Path> pathList = new ArrayList(pathSet);
         List<Path> newPath = new ArrayList<>();
