@@ -209,7 +209,12 @@ public class HCPSuperRouting implements HCPSuperRouteService {
      * @param vportHops
      */
     private void processFlowRequest(DomainId domainId, HCPIOT srcIOT, HCPIOT dstIOT, List<HCPVportHop> vportHops) {
-        Map<PortNumber, Integer> vportIntegerMap = iotVportHop.get(srcIOT);
+
+        for (HCPDomain domain:superController.getDomains()){
+            sendForwardingReplyToDomain(domain.getDeviceId(), srcIOT, dstIOT, HCPVport.IN_PORT, HCPVport.OUT_PORT);
+        }
+
+       /* Map<PortNumber, Integer> vportIntegerMap = iotVportHop.get(srcIOT);
         if (vportIntegerMap == null) {
             vportIntegerMap = new HashMap<>();
             iotVportHop.put(srcIOT, vportIntegerMap);
@@ -259,7 +264,7 @@ public class HCPSuperRouting implements HCPSuperRouteService {
             sendForwardingReplyToDomain(link.src().deviceId(), srcIOT, dstIOT,
                     HCPVport.ofShort((short) former.dst().port().toLong()), HCPVport.ofShort((short) link.src().port().toLong()));
             former = link;
-        }
+        }*/
     }
 
     /**
