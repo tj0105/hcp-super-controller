@@ -212,6 +212,11 @@ public class HCPSuperControllerImpl implements HCPSuperController {
     }
 
     @Override
+    public long getDomainCount() {
+        return domainMap.size();
+    }
+
+    @Override
     public Ethernet parseEthernet(byte data[]) {
         ChannelBuffer buffer = ChannelBuffers.copiedBuffer(data);
         Ethernet eth = null;

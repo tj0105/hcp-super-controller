@@ -14,7 +14,7 @@ import org.onosproject.hcp.types.HCPHost;
  * @Date: 20-3-1 下午12:16
  * @Version 1.0
  */
-@Command(scope = "onos", name = "hcp-domain",
+@Command(scope = "onos", name = "idp-domain",
         description = "Sample Apache Karaf CLI command")
 public class DomainListCommand extends AbstractShellCommand {
 

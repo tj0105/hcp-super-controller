@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date: 20-3-1 下午12:16
  * @Version 1.0
  */
-@Command(scope = "onos", name = "hcp-host",
+@Command(scope = "onos", name = "idp-host",
         description = "Sample Apache Karaf CLI command")
 public class SuperHostList extends AbstractShellCommand {
 

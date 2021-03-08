@@ -248,6 +248,21 @@ public class HCPSuperTopologyManager implements HCPSuperTopoServices {
         return interDomainLinkProviderId;
     }
 
+    @Override
+    public long getInterLinkCount() {
+        return getInterDomainLink().size() ;
+    }
+
+    @Override
+    public long getHostCount() {
+        long count = 0L;
+        for (HCPDomain hcpDomain:superController.getDomains()) {
+            count +=  hostMap.get(hcpDomain.getDomainId()) == null ? 0: hostMap.get(hcpDomain.getDomainId()).size();
+            
+        }
+        return count;
+    }
+
     /**
      * 获取跳数最少的路径
      *

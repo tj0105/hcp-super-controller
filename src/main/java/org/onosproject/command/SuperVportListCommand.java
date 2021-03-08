@@ -13,7 +13,7 @@ import org.onosproject.net.PortNumber;
 import javax.sound.sampled.Port;
 
 
-@Command(scope = "onos", name = "hcp-vport",
+@Command(scope = "onos", name = "idp-vport",
         description = "Sample Apache Karaf CLI command")
 public class SuperVportListCommand extends AbstractShellCommand{
     private HCPSuperTopoServices topoServices;

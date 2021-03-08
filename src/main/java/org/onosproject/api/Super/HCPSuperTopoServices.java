@@ -49,4 +49,7 @@ public interface HCPSuperTopoServices {
     Set<Path> getLoadBlancePath(ElementId src, ElementId dst);
 
     ProviderId getinterDomainLinkProviderId();
+
+    long getInterLinkCount();
+    long getHostCount();
 }

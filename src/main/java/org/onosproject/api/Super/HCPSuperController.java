@@ -49,6 +49,7 @@ public interface HCPSuperController {
     HCPDomain getHCPDomain(long domainId);
 
     Set<HCPDomain> getDomains();
+    long getDomainCount();
     Ethernet parseEthernet(byte []data);
 
     Set<Device> getDevices();

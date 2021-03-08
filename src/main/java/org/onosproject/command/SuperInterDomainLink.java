@@ -17,7 +17,7 @@ import java.util.Comparator;
  * @Date: 20-3-1 下午12:16
  * @Version 1.0
  */
-@Command(scope = "onos", name = "hcp-inter-domain-link",
+@Command(scope = "onos", name = "idp-inter-domain-link",
         description = "Sample Apache Karaf CLI command")
 public class SuperInterDomainLink extends AbstractShellCommand {
     private static final String FMT = "src=%s srcVport=%s, dst=%s dstVport=%s, type=%s, state=%s, expected=%s";

@@ -12,7 +12,7 @@ import org.onosproject.net.topology.TopologyEdge;
 import org.onosproject.net.topology.TopologyVertex;
 
 
-@Command(scope = "onos", name = "hcp-topology",
+@Command(scope = "onos", name = "idp-topology",
         description = "Sample Apache Karaf CLI command")
 public class SuperTopologyCommand extends AbstractShellCommand{
     private HCPSuperTopoServices topoServices;
